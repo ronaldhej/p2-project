@@ -9,6 +9,8 @@ Enter the virtual environment with the following command: `source venv/bin/activ
 
 After this, run `pip install -r requirements.txt` to fetch the required packages.
 
+To exit the virtual environment, type `deactivate`
+
 ### Windows
 No idea, I recommend doing the above steps with WSL
 
