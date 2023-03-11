@@ -35,3 +35,31 @@ class Person:
       self.delta_x = math.cos(angle) * PERSON_SPEED
       self.delta_y = math.sin(angle) * PERSON_SPEED
 
+class Wall:
+   def __init__(self, center_x, center_y, width, height, color):
+      self.center_x = center_x
+      self.center_y = center_y
+      self.width = width
+      self.height = height
+      self.color = color
+
+   def set_vals(self, center_x, center_y, width, height):
+      self.center_x = center_x
+      self.center_y = center_y
+      self.width = width
+      self.height = height
+ 
+   def draw(self):
+      arcade.draw_rectangle_filled(self.center_x, self.center_y, self.width, self.height, arcade.color.WHITE, 0)
+
+class SelectionBox:
+   def __init__(self, center_x, center_y, width, height, color, outline):
+      self.center_x = center_x
+      self.center_y = center_y
+      self.width = width
+      self.height = height
+      self.color = color
+      self.outline = outline
+
+   def draw(self):
+      arcade.draw_rectangle_outline(self.center_x, self.center_y, self.width, self.height, self.color, self.outline, 0)
