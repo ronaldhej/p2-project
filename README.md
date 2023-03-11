@@ -1,5 +1,6 @@
 ## About
 This is just a small experiment to get to know the arcade game engine better, at the moment there's just one "person" that follows the cursor.
+You can now also draw rectangles, the current size of the rectangle is shown as an outline before completion.
 
 ## Getting started
 ### Linux / OSX
