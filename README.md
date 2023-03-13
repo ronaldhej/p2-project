@@ -1,4 +1,5 @@
 ## About
+<<<<<<< HEAD
 This is just a small experiment to get to know the arcade game engine better, rough physics and collision is implemented.
 
 ### Features
@@ -7,6 +8,10 @@ This is just a small experiment to get to know the arcade game engine better, ro
 - Spawning people via right click
 - Map boundaries
 - The "people" will follow the cursor as best they can, there are some bugs though
+=======
+This is just a small experiment to get to know the arcade game engine better, at the moment there's just one "person" that follows the cursor.
+You can now also draw rectangles, the current size of the rectangle is shown as an outline before completion.
+>>>>>>> bbcbbe1df2a7640a04c8dad6c18748d6288ba462
 
 ## Getting started
 ### Linux / OSX
