@@ -106,11 +106,13 @@ class Simulator(arcade.Window):
 
     def on_mouse_press(self, x, y, button, key_modifiers):
         LOG.debug("Mouse pressed: %s", button)
+        #If left click, begin drawing selection box
         if button == 1:
             self.box_start = (x, y)
             vals = get_rectangle_vals(x, y, x, y)
             selection = entity.SelectionBox(*vals, arcade.color.WHITE, 2)
             self.selection_box = selection
+        #If right click, add person
         else:
             inertia = pymunk.moment_for_circle(1, 0, 20, (0, 0))
             body = pymunk.Body(1,  inertia)
@@ -122,6 +124,7 @@ class Simulator(arcade.Window):
             self.person_list.append(person)
 
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, buttons: int, modifiers: int):
+        #If left click dragging, draw selection box
         if buttons == 1:
             start_x, start_y = self.box_start
             if start_x != None and start_y != None:
@@ -132,6 +135,7 @@ class Simulator(arcade.Window):
             return
 
     def on_mouse_release(self, x, y, button, modifiers):
+        #If left click is released, draw final box
         if button == 1:
             LOG.debug("Mouse just released")
             self.selection_box = None

@@ -1,5 +1,12 @@
 ## About
-This is just a small experiment to get to know the arcade game engine better, at the moment there's just one "person" that follows the cursor.
+This is just a small experiment to get to know the arcade game engine better, rough physics and collision is implemented.
+
+### Features
+- Drawing walls with a preview via left click
+- Clearing walls with C
+- Spawning people via right click
+- Map boundaries
+- The "people" will follow the cursor as best they can, there are some bugs though
 
 ## Getting started
 ### Linux / OSX
