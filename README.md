@@ -1,5 +1,5 @@
 ## About
-This is just a small experiment to get to know the arcade game engine better, rough physics and collision is implemented.
+This is just a small experiment to get to know the arcade game engine better, rough physics and collision are implemented.
 
 ### Features
 - Drawing walls with a preview via left click
