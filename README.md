@@ -8,9 +8,6 @@ This is just a small experiment to get to know the arcade game engine better, ro
 - Map boundaries
 - The "people" will follow the cursor as best they can, there are some bugs though.
 
-This is just a small experiment to get to know the arcade game engine better, at the moment there's just one "person" that follows the cursor.
-You can now also draw rectangles, the current size of the rectangle is shown as an outline before completion.
-
 ## Getting started
 ### Linux / OSX
 Before trying to start the program or add packages, generate a virtual environment with `python -m venv venv` in the root folder.
