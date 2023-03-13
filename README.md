@@ -6,8 +6,8 @@ This is just a small experiment to get to know the arcade game engine better, ro
 - Clearing walls with C
 - Spawning people via right click
 - Map boundaries
-- The "people" will follow the cursor as best they can, there are some bugs though
-=======
+- The "people" will follow the cursor as best they can, there are some bugs though.
+
 This is just a small experiment to get to know the arcade game engine better, at the moment there's just one "person" that follows the cursor.
 You can now also draw rectangles, the current size of the rectangle is shown as an outline before completion.
 
