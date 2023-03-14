@@ -19,7 +19,20 @@ After this, run `pip install -r requirements.txt` to fetch the required packages
 To exit the virtual environment, type `deactivate`
 
 ### Windows
-No idea, I recommend doing the above steps with WSL
+Same as for Linux / OSX with a few exceptions.
+
+Generate a virtual environment with `python -m venv venv` in the root folder.
+
+Enter the virtual environment by executing the batch file in the Scripts folder, or use the following command: `venv\Scripts\activate.bat`, you do not need to change directory.
+
+The command line should now say `(venv)`, indicating that you are in a virtual environment.
+
+After this, run `pip install -r requirements.txt` to fetch the required packages.
+
+To exit the virtual environment, type `deactivate`
+
+NOTE: You may need to reinstall the cffi package:
+`pip install --upgrade --force-reinstall cffi`
 
 ## Running the Program
-`python -R main.py`
+`python -R main.py` while in the virtual environment
