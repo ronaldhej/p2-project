@@ -60,7 +60,7 @@ class Simulator(arcade.Window):
     #Called on each update for the sake of drawing entities, sprites etc
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Press space to pause/unpause entity movement. Mouse left: wall, Mouse Right: Spawn Person", 50, 50, arcade.color.WHITE, 12)        
+        arcade.draw_text("Press space to pause/unpause entity movement. Mouse left: wall, Mouse Right: Spawn Person. Clear Walls: C", 50, 50, arcade.color.WHITE, 12)        
         for person in self.person_list:
             person.draw()
         for wall in self.wall_list:
