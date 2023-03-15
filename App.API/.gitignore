@@ -1,0 +1,5 @@
+__pycache__/
+venv/
+
+App.API/framebuffer.png
+App.API/animation.png
