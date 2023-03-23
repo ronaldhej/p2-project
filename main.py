@@ -7,8 +7,8 @@ import entity
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger('arcade')
 #Constants
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 650
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
 SCREEN_TITLE = "Crowd Crush Simulator"
 
 class Simulator(arcade.Window):
