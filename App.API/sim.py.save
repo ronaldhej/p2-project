@@ -1,17 +1,19 @@
 import os
-os.environ["ARCADE_HEADLESS"] = "true"
 
-import sys
+
 from PIL import Image, ImageDraw
 import arcade
 import pyrender
 import io
+import os
 import math
+
 # import glcontext
+
 # Create a 100 x 100 headless window
 
-SPACE_WIDTH = 256
-SPACE_HEIGHT = 256
+SPACE_WIDTH = 512
+SPACE_HEIGHT = 512
 col_black = (0, 0, 0)
 
 
@@ -24,10 +26,10 @@ def run_sim(coords, frames, save):
 
     # Draw a quick rectangle
     for frame in range(0, frames):
-        print(f'current frame: {frame}\t size: {sys.getsizeof(animation)}')
+        print(f'current frame: {frame}')
         window.clear()
         arcade.draw_rectangle_filled(
-            coords[0]+(frame/4), coords[1]+math.sin(frame/10)*100, 12, 12, (231, 191, 14))
+            coords[0]+(frame/2), coords[1]+math.sin(frame/10)*100, 12, 12, (231, 191, 14))
         frame_image = arcade.get_image(0, 0, *window.get_size())
         animation.append(frame_image)
         if save:

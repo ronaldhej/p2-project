@@ -1,3 +1,6 @@
+import os
+os.environ["ARCADE_HEADLESS"] = "true"
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.responses import JSONResponse
@@ -24,7 +27,7 @@ app.add_middleware(
 @app.get("/image")
 async def get_image():
     """get"""
-    image_buffer = sim.run_sim([10, 256], 1000, False)
+    image_buffer = sim.run_sim([10, 128], 1000, False)
 
     # buf = io.BytesIO()
     # image.save(buf, "GIF")
