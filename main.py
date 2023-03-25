@@ -60,11 +60,22 @@ class Simulator(arcade.Window):
     #Called on each update for the sake of drawing entities, sprites etc
     def on_draw(self):
         self.clear()
-        arcade.draw_text("Press space to pause/unpause entity movement. Mouse left: wall, Mouse Right: Spawn Person. Clear Walls: C", 50, 50, arcade.color.WHITE, 12)        
+                
+        arcade.draw_text("Press space to pause/unpause entity movement. Mouse left: wall, Mouse Right: Spawn Person.", 100, 50, arcade.color.GREEN, 20)
+        arcade.draw_text("Clear Walls: C  |  Clear People: Esc", 100, 20, arcade.color.GREEN, 20)
+
+        # Draw the grid
+        for x in range(0, SCREEN_WIDTH, 100):
+            arcade.draw_line(x, 0, x, SCREEN_HEIGHT, arcade.color.WHITE, 1)
+        for y in range(0, SCREEN_HEIGHT, 100):
+            arcade.draw_line(0, y, SCREEN_WIDTH, y, arcade.color.WHITE, 1)
+
+        # Draw the entities
         for person in self.person_list:
             person.draw()
         for wall in self.wall_list:
             wall.draw()
+
         #Draw Map Boundaries
         for line in self.static_lines:
             body = line.body
@@ -101,6 +112,10 @@ class Simulator(arcade.Window):
                 for wall in self.wall_list:
                     self.space.remove(wall.pymunk_shape, wall.pymunk_shape.body)                    
                 self.wall_list.clear()
+            case arcade.key.ESCAPE:
+                for person in self.person_list:
+                    self.space.remove(person.pymunk_shape, person.pymunk_shape.body)
+                self.person_list.clear()
             case _:
                 return
 
