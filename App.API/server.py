@@ -1,15 +1,30 @@
-import os
-os.environ["ARCADE_HEADLESS"] = "true"
+#import os
+#os.environ["ARCADE_HEADLESS"] = "true"
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.responses import JSONResponse
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 import base64
 import json
 
 import sim
+
+class CanvasEntity(BaseModel):
+    """entity used in simulation"""
+    center_x: float
+    center_y: float
+    width: float
+    height: float
+    color: str | None = "White"
+
+class SimRequest(BaseModel):
+    """request containing inputs for a simulation"""
+    agent_num: int
+    runtime: int | None = 10
+    map: list[CanvasEntity] | None = None
 
 app = FastAPI()
 
@@ -22,6 +37,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 @app.get("/image")
@@ -39,6 +55,24 @@ async def get_image():
 
     return JSONResponse(content={"image_gif": buffer_base64.decode('utf-8')})
 
+@app.post("/simulate")
+async def run_sim(request: SimRequest):
+    """post"""
+    print("simulate")
+    try:
+
+        # buf = io.BytesIO()
+        # image.save(buf, "GIF")
+        image_buffer = sim.run_agent_sim(5, True, request.agent_num)
+
+        image_buffer.seek(0)  # important here!
+
+        buffer_bytes = image_buffer.getvalue()
+        buffer_base64 = base64.b64encode(buffer_bytes)
+        return JSONResponse(content={"image_gif": buffer_base64.decode('utf-8')}, status_code=200)
+    except Exception as error:
+        print("Exception occurred")
+        return JSONResponse(content={"msg": "deez", "exception": error}, status_code=500)
 
 @app.get("/")
 async def root():
