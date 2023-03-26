@@ -46,6 +46,7 @@ class Simulator(arcade.Window):
         self.wall_list = []
         self.total_time = 0.0
         self.static_lines = []
+        self.animation = []
 
         #Add Map Boundaries
         #Lower
@@ -84,14 +85,14 @@ class Simulator(arcade.Window):
             pv1 = body.position + line.a.rotated(body.angle)
             pv2 = body.position + line.b.rotated(body.angle)
             arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, arcade.color.WHITE, 5)
-    
+
     def on_update(self, dt):
-        if self.total_time >= 3.0:
+        if self.total_time >= 1.0:
+            frame_image = arcade.get_image(0, 0, *self.get_size())
+            self.animation.append(frame_image)
             print("Fuck")
             arcade.exit()
         else:
-            #frame_image = arcade.get_image(0, 0, (self.space_width, self.space_height))
-            #animation.append(frame_image)
             #frame_image.save("framebuffer.png")
             
             self.total_time += dt
@@ -100,6 +101,9 @@ class Simulator(arcade.Window):
                 person.center_x = person.pymunk_shape.body.position.x
                 person.center_y = person.pymunk_shape.body.position.y
                 person.angle = math.degrees(person.pymunk_shape.body.angle)
+
+            frame_image = arcade.get_image(0, 0, *self.get_size())
+            self.animation.append(frame_image)
     
     def setup(self):
         for i in range(self.agent_num + 1):
@@ -115,20 +119,14 @@ class Simulator(arcade.Window):
 def run_agent_sim(frames, save, agent_num):
     window = Simulator(agent_num)
     window.setup()
+    print("sim start")
     arcade.run()
-    # for frame in range(0, frames):
-    #     frame_image = arcade.get_image(0, 0, *window.get_size())
-    #     animation.append(frame_image)
-    #     if save:
-    #         frame_image.save("framebuffer.png")
-    # buffer = io.BytesIO()
-    # animation[0].save(buffer, format="GIF",
-    #                     save_all=True, append_images=animation[1:], optimize=True, duration=30, loop=0)
     arcade.close_window()
+    print("sim end")
 
+    print("image count", len(window.animation))
     buffer = io.BytesIO()
-    animation[0].save(buffer, format="GIF",
-        save_all=True, append_images=animation[1:], optimize=True, duration=30, loop=0)
+    window.animation[0].save(buffer, format="GIF", save_all=True, append_images=window.animation[1:], optimize=True, duration=30, loop=0)
     return buffer
         
 
@@ -151,7 +149,7 @@ def run_sim(coords, frames, save):
             frame_image.save("framebuffer.png")
 
     buffer = io.BytesIO()
-    animation[0].save(buffer, format="GIF",
+    animation[1].save(buffer, format="GIF",
                       save_all=True, append_images=animation[1:], optimize=True, duration=30, loop=0)
 
     window.close()
