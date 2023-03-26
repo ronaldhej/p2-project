@@ -71,8 +71,8 @@ async def run_sim(request: SimRequest):
         buffer_base64 = base64.b64encode(buffer_bytes)
         return JSONResponse(content={"image_gif": buffer_base64.decode('utf-8')}, status_code=200)
     except Exception as error:
-        print("Exception occurred")
-        return JSONResponse(content={"msg": "deez", "exception": error}, status_code=500)
+        print(error)
+        return JSONResponse(content={"msg": "deez"}, status_code=500)
 
 @app.get("/")
 async def root():

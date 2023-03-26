@@ -86,7 +86,7 @@ class Simulator(arcade.Window):
             arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, arcade.color.WHITE, 5)
     
     def on_update(self, dt):
-        if self.total_time >= 5.0:
+        if self.total_time >= 3.0:
             print("Fuck")
             arcade.exit()
         else:
