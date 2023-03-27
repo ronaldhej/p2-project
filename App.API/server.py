@@ -63,7 +63,7 @@ async def run_sim(request: SimRequest):
 
         # buf = io.BytesIO()
         # image.save(buf, "GIF")
-        image_buffer = sim.run_agent_sim(5, True, request.agent_num)
+        image_buffer = sim.run_agent_sim(60, True, request.agent_num)
 
         image_buffer.seek(0)  # important here!
 

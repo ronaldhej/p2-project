@@ -8,11 +8,14 @@ import pymunk
 import pyrender
 import io
 import math
+import random
 # import glcontext
 # Create a 100 x 100 headless window
 
 SPACE_WIDTH = 256
 SPACE_HEIGHT = 256
+FPS = 120
+AGENT_RADIUS = 8
 col_black = (0, 0, 0)
 
 animation = []
@@ -47,6 +50,7 @@ class Simulator(arcade.Window):
         self.total_time = 0.0
         self.static_lines = []
         self.animation = []
+        self.set_update_rate(1/FPS)
 
         #Add Map Boundaries
         #Lower
@@ -87,7 +91,7 @@ class Simulator(arcade.Window):
             arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, arcade.color.WHITE, 5)
 
     def on_update(self, dt):
-        if self.total_time >= 1.0:
+        if self.total_time >= 3:
             frame_image = arcade.get_image(0, 0, *self.get_size())
             self.animation.append(frame_image)
             print("Fuck")
@@ -96,7 +100,7 @@ class Simulator(arcade.Window):
             #frame_image.save("framebuffer.png")
             
             self.total_time += dt
-            self.space.step(1/60)
+            self.space.step(1/FPS)
             for person in self.person_list:
                 person.center_x = person.pymunk_shape.body.position.x
                 person.center_y = person.pymunk_shape.body.position.y
@@ -106,11 +110,11 @@ class Simulator(arcade.Window):
             self.animation.append(frame_image)
     
     def setup(self):
-        for i in range(self.agent_num + 1):
-            inertia = pymunk.moment_for_circle(1, 0, 20, (0, 0))
+        for i in range(self.agent_num):
+            inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
             body = pymunk.Body(1,  inertia)
-            body.position = (SPACE_WIDTH / 2), (SPACE_HEIGHT / 2)
-            shape = pymunk.Circle(body, 20, pymunk.Vec2d(0, 0))
+            body.position = (SPACE_WIDTH / 2) + (random.random()-0.5)*256, (SPACE_HEIGHT / 2) + (random.random()-0.5)*256
+            shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
             shape.friction = 0.3
             person = Agent(shape, arcade.color.WHITE)
             self.space.add(body, shape)
@@ -126,9 +130,13 @@ def run_agent_sim(frames, save, agent_num):
 
     print("image count", len(window.animation))
     buffer = io.BytesIO()
-    window.animation[0].save(buffer, format="GIF", save_all=True, append_images=window.animation[1:], optimize=True, duration=30, loop=0)
+    window.animation[0].save(buffer, format="GIF", save_all=True, append_images=window.animation[1:], optimize=True, duration=1000/FPS, loop=0)
     return buffer
         
+
+
+
+
 
 def run_sim(coords, frames, save):
     """run simulation, return image"""
@@ -150,7 +158,7 @@ def run_sim(coords, frames, save):
 
     buffer = io.BytesIO()
     animation[1].save(buffer, format="GIF",
-                      save_all=True, append_images=animation[1:], optimize=True, duration=30, loop=0)
+                      save_all=True, append_images=animation[1:], optimize=True, duration=24, loop=0)
 
     window.close()
     return buffer
