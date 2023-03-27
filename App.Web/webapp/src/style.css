@@ -19,12 +19,18 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 8rem;
+  margin: auto;
+  margin-top: 2rem;
+  width: fit-content;
 }
 
 #img-preview {
   border-radius: 8px;
   opacity: 0.2;
+  width: 100%;
+
+  image-rendering: pixelated;
+  /* filter: blur(0.45px); */
 }
 
 button {
@@ -47,6 +53,14 @@ button {
 button:active {
   transform: translate(0px, 4px) scale(0.99);
   transition: .1s ease-out;
+}
+
+input {
+  margin-top: 2rem;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1rem;
+  font-size: 16pt;
 }
 
 #loading {

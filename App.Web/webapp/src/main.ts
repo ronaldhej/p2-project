@@ -4,11 +4,9 @@ import './simulationEditor.ts'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <img id="img-preview" src="./placeholder.png">
-
-      <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
-      <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
-      <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
-
+  <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
+  <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
+  <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
   <img src="https://www.freepnglogos.com/uploads/rubber-duck-png/rubber-duck-duck-png-transparent-images-pictures-photos-1.png" id="loading">
 `
 

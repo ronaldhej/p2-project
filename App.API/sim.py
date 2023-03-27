@@ -12,9 +12,9 @@ import random
 # import glcontext
 # Create a 100 x 100 headless window
 
-SPACE_WIDTH = 256
-SPACE_HEIGHT = 256
-FPS = 120
+SPACE_WIDTH = 512
+SPACE_HEIGHT = 512
+FPS = 30
 AGENT_RADIUS = 8
 col_black = (0, 0, 0)
 
@@ -40,7 +40,7 @@ class Simulator(arcade.Window):
         super().__init__(SPACE_WIDTH, SPACE_HEIGHT)
         self.space_width = SPACE_WIDTH
         self.space_height = SPACE_HEIGHT
-        arcade.set_background_color(arcade.color.BLACK)
+        arcade.set_background_color((25,25,25))
         self.agent_num = agent_num
         self.space = pymunk.Space()
         self.space.iterations = 35
@@ -88,7 +88,7 @@ class Simulator(arcade.Window):
             body = line.body
             pv1 = body.position + line.a.rotated(body.angle)
             pv2 = body.position + line.b.rotated(body.angle)
-            arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, arcade.color.WHITE, 5)
+            arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
 
     def on_update(self, dt):
         if self.total_time >= 3:
@@ -116,7 +116,7 @@ class Simulator(arcade.Window):
             body.position = (SPACE_WIDTH / 2) + (random.random()-0.5)*256, (SPACE_HEIGHT / 2) + (random.random()-0.5)*256
             shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
             shape.friction = 0.3
-            person = Agent(shape, arcade.color.WHITE)
+            person = Agent(shape, (231, 191, 14))
             self.space.add(body, shape)
             self.person_list.append(person)
 
@@ -130,7 +130,7 @@ def run_agent_sim(frames, save, agent_num):
 
     print("image count", len(window.animation))
     buffer = io.BytesIO()
-    window.animation[0].save(buffer, format="GIF", save_all=True, append_images=window.animation[1:], optimize=True, duration=1000/FPS, loop=0)
+    window.animation[0].save(buffer, format="GIF", save_all=True, append_images=window.animation[1:], optimize=True, duration=1000/30, loop=0)
     return buffer
         
 
