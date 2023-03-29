@@ -36,12 +36,15 @@ class Agent:
 
 class Simulator(arcade.Window):
     #Initializing states for the game
-    def __init__(self, agent_num):
+    def __init__(self, agent_num, runtime):
         super().__init__(SPACE_WIDTH, SPACE_HEIGHT)
         self.space_width = SPACE_WIDTH
         self.space_height = SPACE_HEIGHT
         arcade.set_background_color((25,25,25))
+        #request args
         self.agent_num = agent_num
+        self.runtime = runtime
+        #space
         self.space = pymunk.Space()
         self.space.iterations = 35
         self.space.gravity = (0.0, -900.0)
@@ -91,10 +94,9 @@ class Simulator(arcade.Window):
             arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
 
     def on_update(self, dt):
-        if self.total_time >= 3:
+        if self.total_time >= self.runtime:
             frame_image = arcade.get_image(0, 0, *self.get_size())
             self.animation.append(frame_image)
-            print("Fuck")
             arcade.exit()
         else:
             #frame_image.save("framebuffer.png")
@@ -120,8 +122,8 @@ class Simulator(arcade.Window):
             self.space.add(body, shape)
             self.person_list.append(person)
 
-def run_agent_sim(frames, save, agent_num):
-    window = Simulator(agent_num)
+def run_agent_sim(frames, save, agent_num, runtime):
+    window = Simulator(agent_num, runtime)
     window.setup()
     print("sim start")
     arcade.run()

@@ -10,14 +10,14 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <img src="https://www.freepnglogos.com/uploads/rubber-duck-png/rubber-duck-duck-png-transparent-images-pictures-photos-1.png" id="loading">
 `
 
-const elApp: HTMLElement | null = document.getElementById("app");
-const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
-const imgLoading: HTMLImageElement | null = document.getElementById("loading") as HTMLImageElement;
+const elApp: HTMLElement            | null = document.getElementById("app");
+const preview: HTMLImageElement     | null = document.getElementById("img-preview") as HTMLImageElement;
+const imgLoading: HTMLImageElement  | null = document.getElementById("loading") as HTMLImageElement;
 
 //simulation input
 const simAgentNum: HTMLInputElement | null = document.getElementById("simAgentNum") as HTMLInputElement;
-const simRuntime: HTMLInputElement | null = document.getElementById("simRuntime") as HTMLInputElement;
-const getSimBtn: HTMLButtonElement | null = document.getElementById("form-sim-btn") as HTMLButtonElement;
+const simRuntime: HTMLInputElement  | null = document.getElementById("simRuntime") as HTMLInputElement;
+const getSimBtn: HTMLButtonElement  | null = document.getElementById("form-sim-btn") as HTMLButtonElement;
 
 
 function testSim(simRequest: SimRequest) {

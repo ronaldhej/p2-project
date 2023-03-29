@@ -22,7 +22,7 @@ class CanvasEntity(BaseModel):
 
 class SimRequest(BaseModel):
     """request containing inputs for a simulation"""
-    agent_num: int
+    agent_num: int | None = 1
     runtime: int | None = 10
     map: list[CanvasEntity] | None = None
 
@@ -63,7 +63,7 @@ async def run_sim(request: SimRequest):
 
         # buf = io.BytesIO()
         # image.save(buf, "GIF")
-        image_buffer = sim.run_agent_sim(60, True, request.agent_num)
+        image_buffer = sim.run_agent_sim(60, True, request.agent_num, request.runtime)
 
         image_buffer.seek(0)  # important here!
 
