@@ -54,6 +54,7 @@ class Simulator(arcade.Window):
         self.static_lines = []
         self.animation = []
         self.set_update_rate(1/FPS)
+        self.space.collision_slop = 0
 
         #Add Map Boundaries
         #Lower

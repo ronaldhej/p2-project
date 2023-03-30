@@ -2,7 +2,7 @@
 //     runtime: int | None = 10
 //     map: list[CanvasEntity] | None = None
 
-type Entity = {
+type EntityDto = {
     center_x: number,
     center_y: number,
     width: number,
@@ -10,8 +10,8 @@ type Entity = {
     color?: string
 }
 
-type SimRequest = {
+interface SimRequestDto {
     agent_num: number,
     runtime: number,
-    map?: [Entity]
+    map?: [EntityDto]
 }

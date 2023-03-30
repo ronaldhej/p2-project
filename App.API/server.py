@@ -12,7 +12,7 @@ import json
 
 import sim
 
-class CanvasEntity(BaseModel):
+class CanvasEntityDto(BaseModel):
     """entity used in simulation"""
     center_x: float
     center_y: float
@@ -20,11 +20,11 @@ class CanvasEntity(BaseModel):
     height: float
     color: str | None = "White"
 
-class SimRequest(BaseModel):
+class SimRequestDto(BaseModel):
     """request containing inputs for a simulation"""
     agent_num: int | None = 1
     runtime: int | None = 10
-    map: list[CanvasEntity] | None = None
+    map: list[CanvasEntityDto] | None = None
 
 app = FastAPI()
 
@@ -56,14 +56,14 @@ async def get_image():
     return JSONResponse(content={"image_gif": buffer_base64.decode('utf-8')})
 
 @app.post("/simulate")
-async def run_sim(request: SimRequest):
+async def run_sim(request: SimRequestDto):
     """post"""
     print("simulate")
     try:
 
         # buf = io.BytesIO()
         # image.save(buf, "GIF")
-        image_buffer = sim.run_agent_sim(60, True, request.agent_num, request.runtime)
+        image_buffer = sim.run_agent_sim(60, False, request.agent_num, request.runtime)
 
         image_buffer.seek(0)  # important here!
 
