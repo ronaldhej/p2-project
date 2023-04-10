@@ -36,7 +36,7 @@ class Agent:
 
 class Simulator(arcade.Window):
     #Initializing states for the game
-    def __init__(self, agent_num, runtime):
+    def __init__(self, agent_num, runtime, multithreaded:bool):
         super().__init__(SPACE_WIDTH, SPACE_HEIGHT)
         self.space_width = SPACE_WIDTH
         self.space_height = SPACE_HEIGHT
@@ -53,8 +53,13 @@ class Simulator(arcade.Window):
         self.total_time = 0.0
         self.static_lines = []
         self.animation = []
-        self.set_update_rate(1/FPS)
+
         self.space.collision_slop = 0
+
+        #enable multithreading on other platforms than windows
+        if sys.platform != "Win32" and multithreaded:
+            self.space.threaded = True
+            self.space.threads = 4
 
         #Add Map Boundaries
         #Lower
@@ -83,34 +88,36 @@ class Simulator(arcade.Window):
         self.static_lines.append(shape)
     
     def on_draw(self):
-        self.clear()
-        for person in self.person_list:
-            person.draw()
-        for wall in self.wall_list:
-            wall.draw()
-        for line in self.static_lines:
-            body = line.body
-            pv1 = body.position + line.a.rotated(body.angle)
-            pv2 = body.position + line.b.rotated(body.angle)
-            arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
+        pass
+        # self.clear()
+        # for person in self.person_list:
+        #     person.draw()
+        # for wall in self.wall_list:
+        #     wall.draw()
+        # for line in self.static_lines:
+        #     body = line.body
+        #     pv1 = body.position + line.a.rotated(body.angle)
+        #     pv2 = body.position + line.b.rotated(body.angle)
+        #     arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
 
     def on_update(self, dt):
-        if self.total_time >= self.runtime:
-            frame_image = arcade.get_image(0, 0, *self.get_size())
-            self.animation.append(frame_image)
-            arcade.exit()
-        else:
-            #frame_image.save("framebuffer.png")
+        pass
+        # if self.total_time >= self.runtime:
+        #     frame_image = arcade.get_image(0, 0, *self.get_size())
+        #     self.animation.append(frame_image)
+        #     arcade.exit()
+        # else:
+        #     #frame_image.save("framebuffer.png")
             
-            self.total_time += dt
-            self.space.step(1/FPS)
-            for person in self.person_list:
-                person.center_x = person.pymunk_shape.body.position.x
-                person.center_y = person.pymunk_shape.body.position.y
-                person.angle = math.degrees(person.pymunk_shape.body.angle)
+        #     self.total_time += dt
+        #     self.space.step(1/FPS)
+        #     for person in self.person_list:
+        #         person.center_x = person.pymunk_shape.body.position.x
+        #         person.center_y = person.pymunk_shape.body.position.y
+        #         person.angle = math.degrees(person.pymunk_shape.body.angle)
 
-            frame_image = arcade.get_image(0, 0, *self.get_size())
-            self.animation.append(frame_image)
+        #     frame_image = arcade.get_image(0, 0, *self.get_size())
+        #     self.animation.append(frame_image)
     
     def setup(self):
         for i in range(self.agent_num):
@@ -123,45 +130,50 @@ class Simulator(arcade.Window):
             self.space.add(body, shape)
             self.person_list.append(person)
 
-def run_agent_sim(frames, save, agent_num, runtime):
-    window = Simulator(agent_num, runtime)
+def run_agent_sim(frames, save, agent_num, runtime) -> io.BytesIO:
+    """run simulation on input parameters and return results"""
+    window = Simulator(agent_num, runtime, False)
     window.setup()
     print("sim start")
-    arcade.run()
+    # arcade.run()
+    for _ in range(runtime*FPS):
+        sim_draw(window)
+        sim_update(window)
+    arcade.exit()
     arcade.close_window()
     print("sim end")
 
     print("image count", len(window.animation))
     buffer = io.BytesIO()
-    window.animation[0].save(buffer, format="GIF", save_all=True, append_images=window.animation[1:], optimize=True, duration=1000/30, loop=0)
+    window.animation[0].save(buffer,
+                             format="GIF",
+                             save_all=True,
+                             append_images=window.animation[1:],
+                             optimize=True,
+                             duration=1000/30,
+                             loop=0)
     return buffer
-        
 
+def sim_draw(sim: Simulator):
+    """draw step of simulation"""
+    sim.clear()
+    for person in sim.person_list:
+        person.draw()
+    for wall in sim.wall_list:
+        wall.draw()
+    for line in sim.static_lines:
+        body = line.body
+        pv1 = body.position + line.a.rotated(body.angle)
+        pv2 = body.position + line.b.rotated(body.angle)
+        arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
 
+def sim_update(sim: Simulator):
+    """update step of simulation"""
+    sim.space.step(1/FPS)
+    for person in sim.person_list:
+        person.center_x = person.pymunk_shape.body.position.x
+        person.center_y = person.pymunk_shape.body.position.y
+        person.angle = math.degrees(person.pymunk_shape.body.angle)
 
-
-
-def run_sim(coords, frames, save):
-    """run simulation, return image"""
-    window = arcade.open_window(SPACE_WIDTH, SPACE_HEIGHT)
-    arcade.set_background_color((55, 55, 55))
-    animation = []
-    # window.headless = True
-
-    # Draw a quick rectangle
-    for frame in range(0, frames):
-        print(f'current frame: {frame}\t size: {sys.getsizeof(animation)}')
-        window.clear()
-        arcade.draw_rectangle_filled(
-            coords[0]+(frame/4), coords[1]+math.sin(frame/10)*100, 12, 12, (231, 191, 14))
-        frame_image = arcade.get_image(0, 0, *window.get_size())
-        animation.append(frame_image)
-        if save:
-            frame_image.save("framebuffer.png")
-
-    buffer = io.BytesIO()
-    animation[1].save(buffer, format="GIF",
-                      save_all=True, append_images=animation[1:], optimize=True, duration=24, loop=0)
-
-    window.close()
-    return buffer
+    frame_image = arcade.get_image(0, 0, *sim.get_size())
+    sim.animation.append(frame_image)

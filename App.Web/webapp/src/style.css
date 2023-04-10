@@ -5,13 +5,21 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: var(--c-dark);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  --c-dark:     #1E212D;
+  --c-semidark: #2C323F;
+  --c-mid:      #5C6B80;
+  --c-light:    #EFEFEF;
+  --c-white:    #FFFFFF;
+  --c-attention:#e44f22;
+  --c-attention_light:#f18b37;
 }
 
 body {
@@ -55,8 +63,9 @@ body {
   font-size: 12pt;
   cursor: pointer;
   text-align: left;
-  background-color: #38383a;
-  color: #dfe9e8;
+  background-color: var(--c-semidark);
+  color: var(--c-light);
+  border: 0px solid var(--c-dark);
   
   height: fit-content;
   width: 100%;
@@ -66,14 +75,14 @@ body {
 }
 
 .navbar button:hover{
-  background-color: #676e6d;
-  border-bottom-color: #676e6d;
+  background-color: var(--c-mid);
+  border-bottom-color: var(--c-mid);
   transition: 0.5s;
 }
 
 .navbar button:active{
-  background-color: #e7bf0e;
-  border-bottom-color: #e7bf0e;
+  background-color: var(--c-attention);
+  border-bottom-color: var(--c-attention);
   transform: none;
   transition: 0.0s;
 }
@@ -97,18 +106,19 @@ body {
   border-bottom-right-radius: 12px;
 }
 .navbar button:has( + button.active-link) {
-  border-bottom-left-radius: 12px;
-  border-bottom: 4px solid #242424;
+  border-bottom-left-radius: 24px;
+  border-bottom: 8px solid var(--c-dark);
 }
 .navbar button.active-link + button {
-  border-top-left-radius: 12px;
-  border-top: 8px solid #242424;
+  border-top-left-radius: 24px;
+  border-top: 8px solid var(--c-dark);
 }
 .navbar button.active-link span {
   width: 4px;
   min-width: 4px;
   height: 3em;
-  background-color: #e7bf0e;
+  background-color: var(--c-attention);
+  opacity: 1;
   transition: .2s ease-out;
 }
 
@@ -119,7 +129,8 @@ body {
   width: 0.5em;
   min-width: .5em;
   height: 0px;
-  background-color: #38383a00;
+  background-color: var(--c-mid);
+  opacity: 0;
   border-radius: 999px;
   transition: .2s ease-out;
 }
@@ -138,9 +149,9 @@ button {
   width: 512px;
   border-radius: 8px;
   height: 4rem;
-  background-color: #e7bf0e;
+  background-color: var(--c-mid);
   background: radial-gradient();
-  color: #1f1f1f;
+  color: var(--c-dark);
   font-size: 16pt;
 
   border: 0px;
@@ -151,6 +162,7 @@ button {
 
 button:active {
   transform: translate(0px, 4px) scale(0.99);
+  background-color: var(--c-attention);
   transition: .1s ease-out;
 }
 
@@ -160,6 +172,19 @@ input {
   width: 100%;
   padding: 1rem;
   font-size: 16pt;
+  border: 0px;
+
+  background-color: var(--c-semidark);
+  color: var(--c-light);
+  border-radius: 8px;
+  transition: 0.2s ease-out;
+}
+
+input:focus {
+  background-color: var(--c-mid);
+  outline: none;
+
+  transition: 0.1s ease-out;
 }
 
 #loading {
