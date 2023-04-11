@@ -34,6 +34,18 @@ class Agent:
     def draw(self):
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
 
+class FlowField:
+    def __init__(self, width: int, height: int, resolution: int) -> None:
+        self.width = width
+        self.height = height
+        self.resolution = resolution
+
+    def update():
+        pass
+
+    def get_cell(x, y):
+        pass
+
 class Simulator(arcade.Window):
     #Initializing states for the game
     def __init__(self, agent_num, runtime, multithreaded:bool):
