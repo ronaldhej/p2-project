@@ -31,22 +31,70 @@ class Agent:
         self.color = color
         self.pymunk_shape = pymunk_shape
         self.direction = 0
-        self.magnitude = 1
+        self.target_direction = 0
+        self.magnitude = 20
 
     def draw(self):
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
+        arcade.draw_line(self.center_x,
+                    self.center_y,
+                    self.center_x+math.cos(self.direction)*16,
+                    self.center_y+math.sin(self.direction)*16,
+                    (0,0,255),2)
+
+class Cell:
+    def __init__(self, x:int, y:int) -> None:
+        self.direction = 0
+        self.weight = 1
+        self.cost = 0
+        self.x:int = x
+        self.y:int = y
 
 class FlowField:
     def __init__(self, width: int, height: int, resolution: int) -> None:
         self.width = width
         self.height = height
+        self.cell_width: int = 0
+        self.cell_height: int = 0
+        self.cell_x: int = 0
+        self.cell_y: int = 0
         self.resolution = resolution
+        self.field = None
 
-    def update():
+    def setup(self):
+        """initialize cell arrays"""
+        self.cell_width = round(self.width/16)
+        self.cell_height = round(self.width/16)
+        self.field = [[None]*self.resolution for i in range(self.resolution)]
+        print(self.cell_width)
+        for i in range(self.resolution):
+            for j in range(self.resolution):
+                new_cell:Cell = Cell(i,j)
+                new_cell.direction = math.radians(random.random()*360)
+                self.field[i][j] = new_cell
+
+    def update(self):
         pass
 
-    def get_cell(x, y):
-        pass
+    def get_cell(self, x, y) -> Cell:
+        cell_x = int(x / self.cell_width)
+        cell_y = int(y / self.cell_height)
+        print(cell_x, cell_y)
+        return self.field[cell_x][cell_y]
+
+    def draw(self):
+        for x in range(0, self.resolution):
+            for y in range(0, self.resolution):
+                cell:Cell = self.field[x][y]
+                center_x = self.cell_width*cell.x + self.cell_width/2
+                center_y = self.cell_height*cell.y + self.cell_height/2
+                arcade.draw_line(center_x,
+                                 center_y,
+                                 center_x+math.cos(cell.direction)*8,
+                                 center_y+math.sin(cell.direction)*8,
+                                 (255,255,255),1)
+            # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
+        
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -61,12 +109,13 @@ class Simulator(arcade.Window):
         #space
         self.space = pymunk.Space()
         self.space.iterations = 35
-        self.space.gravity = (0.0, -900.0)
+        self.space.gravity = (0.0, 0.0)
         self.person_list = []
         self.wall_list = []
         self.total_time = 0.0
         self.static_lines = []
         self.animation = []
+        self.flowfield:FlowField = None
 
         self.space.collision_slop = 0
 
@@ -132,7 +181,7 @@ class Simulator(arcade.Window):
 
         #     frame_image = arcade.get_image(0, 0, *self.get_size())
         #     self.animation.append(frame_image)
-    
+
     def setup(self):
         for i in range(self.agent_num):
             inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
@@ -150,12 +199,17 @@ class Scenario:
         pass
 
 
-def run_agent_sim(frames, save, agent_num, runtime) -> io.BytesIO:
+def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
     window.setup()
     print("sim start")
     # arcade.run()
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution)
+    flowfield.setup()
+
+    window.flowfield = flowfield
+
     for _ in range(runtime*FPS):
         sim_draw(window)
         sim_update(window)
@@ -176,13 +230,14 @@ def run_agent_sim(frames, save, agent_num, runtime) -> io.BytesIO:
 
 def draw_grid(res: int):
     for i in range(res):
-        arcade.draw_line(SPACE_WIDTH/res*i,0,SPACE_WIDTH/res*i,SPACE_HEIGHT, (255,255,255), 1)
-        arcade.draw_line(0,SPACE_HEIGHT/res*i,SPACE_WIDTH,SPACE_HEIGHT/res*i, (255,255,255), 1)
+        arcade.draw_line(SPACE_WIDTH/res*i,0,SPACE_WIDTH/res*i,SPACE_HEIGHT, (55,55,55), 1)
+        arcade.draw_line(0,SPACE_HEIGHT/res*i,SPACE_WIDTH,SPACE_HEIGHT/res*i, (55,55,55), 1)
 
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    draw_grid(4)
+    #draw_grid(16)
+    #sim.flowfield.draw()
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
@@ -200,6 +255,16 @@ def sim_update(sim: Simulator):
         person.center_x = person.pymunk_shape.body.position.x
         person.center_y = person.pymunk_shape.body.position.y
         person.angle = math.degrees(person.pymunk_shape.body.angle)
+        person.target_direction = sim.flowfield.get_cell(person.center_x, person.center_y).direction
+
+        diff = ( person.target_direction - person.direction + math.pi ) % (2*math.pi) - math.pi
+        if diff < -math.pi:
+            diff = diff + 360
+
+        person.direction = person.direction + (diff)*0.1
+        person.pymunk_shape.body.velocity = (math.cos(person.direction)*person.magnitude, 
+                                             math.sin(person.direction)*person.magnitude)
+        
 
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
