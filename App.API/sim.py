@@ -30,6 +30,8 @@ class Agent:
         self.angle = pymunk_shape.body.angle
         self.color = color
         self.pymunk_shape = pymunk_shape
+        self.direction = 0
+        self.magnitude = 1
 
     def draw(self):
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
@@ -141,6 +143,12 @@ class Simulator(arcade.Window):
             person = Agent(shape, (231, 191, 14))
             self.space.add(body, shape)
             self.person_list.append(person)
+
+
+class Scenario:
+    def __init__(self, agent_num, runtime) -> None:
+        pass
+
 
 def run_agent_sim(frames, save, agent_num, runtime) -> io.BytesIO:
     """run simulation on input parameters and return results"""
