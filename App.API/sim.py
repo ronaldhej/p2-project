@@ -174,9 +174,15 @@ def run_agent_sim(frames, save, agent_num, runtime) -> io.BytesIO:
                              loop=0)
     return buffer
 
+def draw_grid(res: int):
+    for i in range(res):
+        arcade.draw_line(SPACE_WIDTH/res*i,0,SPACE_WIDTH/res*i,SPACE_HEIGHT, (255,255,255), 1)
+        arcade.draw_line(0,SPACE_HEIGHT/res*i,SPACE_WIDTH,SPACE_HEIGHT/res*i, (255,255,255), 1)
+
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
+    draw_grid(4)
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
