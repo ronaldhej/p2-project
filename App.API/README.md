@@ -1,5 +1,5 @@
 ### Linux / OSX
-Before trying to start the program or add packages, generate a virtual environment with `python -m venv venv` in the root folder.
+Before trying to start the program or add packages, generate a virtual environment with `python -m venv venv` in App.API.
 
 Enter the virtual environment with the following command: `source venv/bin/activate` from within the root folder.
 
