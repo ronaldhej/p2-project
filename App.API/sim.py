@@ -34,13 +34,17 @@ class Agent:
         self.target_direction = 0
         self.magnitude = 20
 
+    def update_vel(self):
+        self.pymunk_shape.body.velocity = (math.cos(self.direction)*self.magnitude,
+                                           math.sin(self.direction)*self.magnitude)
+
     def draw(self):
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
-        arcade.draw_line(self.center_x,
-                    self.center_y,
-                    self.center_x+math.cos(self.direction)*16,
-                    self.center_y+math.sin(self.direction)*16,
-                    (0,0,255),2)
+        # arcade.draw_line(self.center_x,
+        #             self.center_y,
+        #             self.center_x+math.cos(self.direction)*16,
+        #             self.center_y+math.sin(self.direction)*16,
+        #             (0,0,255),2)
 
 class Cell:
     def __init__(self, x:int, y:int) -> None:
@@ -65,7 +69,7 @@ class FlowField:
         """initialize cell arrays"""
         self.cell_width = round(self.width/16)
         self.cell_height = round(self.width/16)
-        self.field = [[None]*self.resolution for i in range(self.resolution)]
+        self.field = [[None]*self.resolution for _ in range(self.resolution)]
         print(self.cell_width)
         for i in range(self.resolution):
             for j in range(self.resolution):
@@ -79,7 +83,6 @@ class FlowField:
     def get_cell(self, x, y) -> Cell:
         cell_x = int(x / self.cell_width)
         cell_y = int(y / self.cell_height)
-        print(cell_x, cell_y)
         return self.field[cell_x][cell_y]
 
     def draw(self):
@@ -94,7 +97,6 @@ class FlowField:
                                  center_y+math.sin(cell.direction)*8,
                                  (255,255,255),1)
             # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
-        
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -252,19 +254,20 @@ def sim_update(sim: Simulator):
     """update step of simulation"""
     sim.space.step(1/FPS)
     for person in sim.person_list:
-        person.center_x = person.pymunk_shape.body.position.x
-        person.center_y = person.pymunk_shape.body.position.y
-        person.angle = math.degrees(person.pymunk_shape.body.angle)
-        person.target_direction = sim.flowfield.get_cell(person.center_x, person.center_y).direction
+        xpos = person.pymunk_shape.body.position.x
+        ypos = person.pymunk_shape.body.position.y
+        person.center_x = xpos
+        person.center_y = ypos
+        #person.angle = math.degrees(person.pymunk_shape.body.angle)
+        person.target_direction = sim.flowfield.get_cell(xpos, ypos).direction
 
         diff = ( person.target_direction - person.direction + math.pi ) % (2*math.pi) - math.pi
         if diff < -math.pi:
             diff = diff + 360
 
         person.direction = person.direction + (diff)*0.1
-        person.pymunk_shape.body.velocity = (math.cos(person.direction)*person.magnitude, 
-                                             math.sin(person.direction)*person.magnitude)
-        
+        person.update_vel()
+
 
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
