@@ -35,6 +35,7 @@ class Agent:
         self.magnitude = 20
 
     def update_vel(self):
+        """update agent velocity"""
         self.pymunk_shape.body.velocity = (math.cos(self.direction)*self.magnitude,
                                            math.sin(self.direction)*self.magnitude)
 
@@ -49,10 +50,11 @@ class Agent:
 class Cell:
     def __init__(self, x:int, y:int) -> None:
         self.direction = 0
-        self.weight = 1
-        self.cost = 0
+        self.weight:int = 1
+        self.cost:int = 0
         self.x:int = x
         self.y:int = y
+        self.neighbors:list[Cell] = []
 
 class FlowField:
     def __init__(self, width: int, height: int, resolution: int) -> None:
@@ -63,22 +65,56 @@ class FlowField:
         self.cell_x: int = 0
         self.cell_y: int = 0
         self.resolution = resolution
-        self.field = None
+        self.field:list[list[Cell]] = []
+        self.destination_cell:tuple[int,int] = (8,8)
 
     def setup(self):
         """initialize cell arrays"""
         self.cell_width = round(self.width/16)
         self.cell_height = round(self.width/16)
-        self.field = [[None]*self.resolution for _ in range(self.resolution)]
+        self.field = [[Cell]*self.resolution for _ in range(self.resolution)]
         print(self.cell_width)
         for i in range(self.resolution):
             for j in range(self.resolution):
                 new_cell:Cell = Cell(i,j)
                 new_cell.direction = math.radians(random.random()*360)
                 self.field[i][j] = new_cell
-
+        for x in range(self.resolution):
+            for y in range(self.resolution):
+                cell:Cell = self.field[x][y]
+                cell.neighbors.append(self.field[cell.x][cell.y - 1])
+                cell.neighbors.append(self.field[cell.x][cell.y + 1])
+                cell.neighbors.append(self.field[cell.x - 1][cell.y - 1])
+                cell.neighbors.append(self.field[cell.x - 1][cell.y + 1])
+                cell.neighbors.append(self.field[cell.x + 1][cell.y])
+                cell.neighbors.append(self.field[cell.x - 1][cell.y])
+                cell.neighbors.append(self.field[cell.x + 1][cell.y - 1])
+                cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
+            
     def update(self):
-        pass
+        (dest_x, dest_y) = self.destination_cell
+        open_list:list[Cell] = []
+        current_cell:Cell = None
+        for i in range(self.resolution):
+            for j in range(self.resolution):
+                cell = self.field[i][j]
+                if cell == self.field[dest_x][dest_y]:
+                    cell.cost = 0
+                    open_list.append(cell)
+                else:
+                    cell.cost = 65535
+        current_cell:Cell = open_list[0]
+        print(current_cell).cost
+        while len(open_list) > 0:
+            for cell in current_cell.neighbors:
+                if cell not in open_list:
+                    open_list.append(cell)
+            print(open_list)
+            break
+            
+
+
+
 
     def get_cell(self, x, y) -> Cell:
         cell_x = int(x / self.cell_width)
@@ -91,11 +127,15 @@ class FlowField:
                 cell:Cell = self.field[x][y]
                 center_x = self.cell_width*cell.x + self.cell_width/2
                 center_y = self.cell_height*cell.y + self.cell_height/2
-                arcade.draw_line(center_x,
-                                 center_y,
-                                 center_x+math.cos(cell.direction)*8,
-                                 center_y+math.sin(cell.direction)*8,
-                                 (255,255,255),1)
+                color:arcade.Color = (255,255,255)
+                if (x,y) == self.destination_cell:
+                    color = (255,0,0)
+                # arcade.draw_line(center_x,
+                #                  center_y,
+                #                  center_x+math.cos(cell.direction)*8,
+                #                  center_y+math.sin(cell.direction)*8,
+                #                  color,1)
+                arcade.draw_text(str(cell.cost),center_x, center_y, color, 8)
             # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
 
 class Simulator(arcade.Window):
@@ -209,6 +249,7 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     # arcade.run()
     flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution)
     flowfield.setup()
+    flowfield.update()
 
     window.flowfield = flowfield
 
@@ -239,7 +280,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(16)
-    #sim.flowfield.draw()
+    sim.flowfield.draw()
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
