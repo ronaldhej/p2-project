@@ -82,14 +82,14 @@ class FlowField:
         for x in range(self.resolution):
             for y in range(self.resolution):
                 cell:Cell = self.field[x][y]
-                cell.neighbors.append(self.field[cell.x][cell.y - 1])
-                cell.neighbors.append(self.field[cell.x][cell.y + 1])
-                cell.neighbors.append(self.field[cell.x - 1][cell.y - 1])
-                cell.neighbors.append(self.field[cell.x - 1][cell.y + 1])
-                cell.neighbors.append(self.field[cell.x + 1][cell.y])
-                cell.neighbors.append(self.field[cell.x - 1][cell.y])
-                cell.neighbors.append(self.field[cell.x + 1][cell.y - 1])
-                cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
+                if cell.y > 0:                      cell.neighbors.append(self.field[cell.x][cell.y - 1])
+                if cell.y < self.resolution-1:      cell.neighbors.append(self.field[cell.x][cell.y + 1])
+                # cell.neighbors.append(self.field[cell.x - 1][cell.y - 1])
+                # cell.neighbors.append(self.field[cell.x - 1][cell.y + 1])
+                # cell.neighbors.append(self.field[cell.x + 1][cell.y])
+                # cell.neighbors.append(self.field[cell.x - 1][cell.y])
+                # cell.neighbors.append(self.field[cell.x + 1][cell.y - 1])
+                # cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
             
     def update(self):
         (dest_x, dest_y) = self.destination_cell
@@ -103,12 +103,13 @@ class FlowField:
                     open_list.append(cell)
                 else:
                     cell.cost = 65535
-        current_cell:Cell = open_list[0]
-        print(current_cell).cost
         while len(open_list) > 0:
+            current_cell:Cell = open_list.pop(0)
             for cell in current_cell.neighbors:
                 if cell not in open_list:
                     open_list.append(cell)
+                new_cost:int = current_cell.cost + cell.weight
+                if new_cost < cell.cost: cell.cost = new_cost
             print(open_list)
             break
             
@@ -135,7 +136,7 @@ class FlowField:
                 #                  center_x+math.cos(cell.direction)*8,
                 #                  center_y+math.sin(cell.direction)*8,
                 #                  color,1)
-                arcade.draw_text(str(cell.cost),center_x, center_y, color, 8)
+                if cell.cost < 65535: arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
             # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
 
 class Simulator(arcade.Window):
