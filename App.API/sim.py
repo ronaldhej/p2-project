@@ -73,7 +73,6 @@ class FlowField:
         self.cell_width = round(self.width/16)
         self.cell_height = round(self.width/16)
         self.field = [[Cell]*self.resolution for _ in range(self.resolution)]
-        print(self.cell_width)
         for i in range(self.resolution):
             for j in range(self.resolution):
                 new_cell:Cell = Cell(i,j)
@@ -86,8 +85,8 @@ class FlowField:
                 if cell.y < self.resolution-1:      cell.neighbors.append(self.field[cell.x][cell.y + 1])
                 # cell.neighbors.append(self.field[cell.x - 1][cell.y - 1])
                 # cell.neighbors.append(self.field[cell.x - 1][cell.y + 1])
-                # cell.neighbors.append(self.field[cell.x + 1][cell.y])
-                # cell.neighbors.append(self.field[cell.x - 1][cell.y])
+                if cell.x > 0: cell.neighbors.append(self.field[cell.x - 1][cell.y])
+                if cell.x < self.resolution-1:      cell.neighbors.append(self.field[cell.x + 1][cell.y])
                 # cell.neighbors.append(self.field[cell.x + 1][cell.y - 1])
                 # cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
             
@@ -106,13 +105,11 @@ class FlowField:
         while len(open_list) > 0:
             current_cell:Cell = open_list.pop(0)
             for cell in current_cell.neighbors:
-                if cell not in open_list:
+                if cell not in open_list and cell.cost >= 65535:
                     open_list.append(cell)
                 new_cost:int = current_cell.cost + cell.weight
                 if new_cost < cell.cost: cell.cost = new_cost
-            print(open_list)
-            break
-            
+
 
 
 
@@ -306,7 +303,6 @@ def sim_update(sim: Simulator):
         diff = ( person.target_direction - person.direction + math.pi ) % (2*math.pi) - math.pi
         if diff < -math.pi:
             diff = diff + 360
-
         person.direction = person.direction + (diff)*0.1
         person.update_vel()
 
