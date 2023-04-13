@@ -83,12 +83,8 @@ class FlowField:
                 cell:Cell = self.field[x][y]
                 if cell.y > 0:                      cell.neighbors.append(self.field[cell.x][cell.y - 1])
                 if cell.y < self.resolution-1:      cell.neighbors.append(self.field[cell.x][cell.y + 1])
-                # cell.neighbors.append(self.field[cell.x - 1][cell.y - 1])
-                # cell.neighbors.append(self.field[cell.x - 1][cell.y + 1])
-                if cell.x > 0: cell.neighbors.append(self.field[cell.x - 1][cell.y])
+                if cell.x > 0:                      cell.neighbors.append(self.field[cell.x - 1][cell.y])
                 if cell.x < self.resolution-1:      cell.neighbors.append(self.field[cell.x + 1][cell.y])
-                # cell.neighbors.append(self.field[cell.x + 1][cell.y - 1])
-                # cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
             
     def update(self):
         (dest_x, dest_y) = self.destination_cell
@@ -109,6 +105,15 @@ class FlowField:
                     open_list.append(cell)
                 new_cost:int = current_cell.cost + cell.weight
                 if new_cost < cell.cost: cell.cost = new_cost
+        for i in range(self.resolution):
+            for j in range(self.resolution):
+                cell = self.field[i][j]
+                best:Cell = cell.neighbors[0]
+                for n in cell.neighbors:
+                    if n.cost < best.cost: best = n
+                xdir = best.x - cell.x
+                ydir = best.y - cell.y
+                cell.direction = math.atan(ydir/xdir)
 
 
 
@@ -125,16 +130,16 @@ class FlowField:
                 cell:Cell = self.field[x][y]
                 center_x = self.cell_width*cell.x + self.cell_width/2
                 center_y = self.cell_height*cell.y + self.cell_height/2
-                color:arcade.Color = (255,255,255)
+                color:arcade.Color = (int(cell.cost/16*255),55,55)
                 if (x,y) == self.destination_cell:
                     color = (255,0,0)
-                # arcade.draw_line(center_x,
-                #                  center_y,
-                #                  center_x+math.cos(cell.direction)*8,
-                #                  center_y+math.sin(cell.direction)*8,
-                #                  color,1)
+                arcade.draw_line(center_x,
+                                 center_y,
+                                 center_x+math.cos(cell.direction)*8,
+                                 center_y+math.sin(cell.direction)*8,
+                                 (255,255,255),1)
                 if cell.cost < 65535: arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
-            # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
+            #arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
 
 class Simulator(arcade.Window):
     #Initializing states for the game
