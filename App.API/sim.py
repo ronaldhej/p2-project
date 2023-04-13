@@ -35,12 +35,12 @@ class Agent:
         self.magnitude = 20
 
     def draw(self):
-        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 10, (256, 0, 0))
+        arcade.draw_circle_outline(self.center_x, self.center_y, self.radius + 6, (256, 0, 0))
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
         arcade.draw_line(self.center_x,
                     self.center_y,
-                    self.center_x+math.cos(self.direction)*16,
-                    self.center_y+math.sin(self.direction)*16,
+                    self.center_x+math.cos(self.direction)*10,
+                    self.center_y+math.sin(self.direction)*10,
                     (0,0,255),2)
 
 class Cell:
@@ -95,7 +95,8 @@ class FlowField:
                                  center_y+math.sin(cell.direction)*8,
                                  (255,255,255),1)
             # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
-        
+
+
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -117,8 +118,10 @@ class Simulator(arcade.Window):
         self.static_lines = []
         self.animation = []
         self.flowfield:FlowField = None
-
         self.space.collision_slop = 0
+
+        self.person_sprite_list =  None
+        self.person_sprite = None
 
         #enable multithreading on other platforms than windows
         if sys.platform != "Win32" and multithreaded:
@@ -193,7 +196,8 @@ class Simulator(arcade.Window):
             person = Agent(shape, (231, 191, 14))
             self.space.add(body, shape)
             self.person_list.append(person)
-
+        self.person_sprite_list = arcade.SpriteList()
+        self.person_sprite_list.append(self.person_sprite)
 
 class Scenario:
     def __init__(self, agent_num, runtime) -> None:
@@ -265,6 +269,8 @@ def sim_update(sim: Simulator):
         person.direction = person.direction + (diff)*0.1
         person.pymunk_shape.body.velocity = (math.cos(person.direction)*person.magnitude, 
                                              math.sin(person.direction)*person.magnitude)
+        if arcade.check_for_collision_with_lists(sim.person_sprite, sim.person_sprite):
+            print("Test")
         
 
     frame_image = arcade.get_image(0, 0, *sim.get_size())
