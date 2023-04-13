@@ -34,6 +34,7 @@ class Agent:
         self.magnitude = 1
 
     def draw(self):
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 10, (256, 0, 0))
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
 
 class FlowField:
