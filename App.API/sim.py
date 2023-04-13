@@ -55,6 +55,7 @@ class Cell:
         self.x:int = x
         self.y:int = y
         self.neighbors:list[Cell] = []
+        self.direct_neighbors = 0
 
 class FlowField:
     def __init__(self, width: int, height: int, resolution: int) -> None:
@@ -81,10 +82,24 @@ class FlowField:
         for x in range(self.resolution):
             for y in range(self.resolution):
                 cell:Cell = self.field[x][y]
-                if cell.y > 0:                      cell.neighbors.append(self.field[cell.x][cell.y - 1])
-                if cell.y < self.resolution-1:      cell.neighbors.append(self.field[cell.x][cell.y + 1])
-                if cell.x > 0:                      cell.neighbors.append(self.field[cell.x - 1][cell.y])
-                if cell.x < self.resolution-1:      cell.neighbors.append(self.field[cell.x + 1][cell.y])
+                if cell.y > 0:
+                    cell.neighbors.append(self.field[cell.x][cell.y - 1]) #N
+                    cell.direct_neighbors += 1
+                if cell.y < self.resolution-1:
+                    cell.neighbors.append(self.field[cell.x][cell.y + 1]) #S
+                    cell.direct_neighbors += 1
+                if cell.x > 0:
+                    cell.neighbors.append(self.field[cell.x - 1][cell.y]) #W
+                    cell.direct_neighbors += 1
+                if cell.x < self.resolution-1:
+                    cell.neighbors.append(self.field[cell.x + 1][cell.y]) #E
+                    cell.direct_neighbors += 1
+
+                #diagonal
+                if cell.x > 0 and cell.y > 0:                                       cell.neighbors.append(self.field[cell.x - 1][cell.y - 1])
+                if cell.x < self.resolution-1 and cell.y > 0:                       cell.neighbors.append(self.field[cell.x + 1][cell.y - 1])
+                if cell.x > 0 and cell.y < self.resolution-1:                       cell.neighbors.append(self.field[cell.x - 1][cell.y + 1])
+                if cell.x < self.resolution-1 and cell.y < self.resolution-1:       cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
             
     def update(self):
         (dest_x, dest_y) = self.destination_cell
@@ -100,7 +115,7 @@ class FlowField:
                     cell.cost = 65535
         while len(open_list) > 0:
             current_cell:Cell = open_list.pop(0)
-            for cell in current_cell.neighbors:
+            for cell in current_cell.neighbors[:current_cell.direct_neighbors]:
                 if cell not in open_list and cell.cost >= 65535:
                     open_list.append(cell)
                 new_cost:int = current_cell.cost + cell.weight
@@ -113,7 +128,7 @@ class FlowField:
                     if n.cost < best.cost: best = n
                 xdir = best.x - cell.x
                 ydir = best.y - cell.y
-                cell.direction = math.atan(ydir/xdir)
+                cell.direction = math.atan2(ydir,xdir)
 
 
 
