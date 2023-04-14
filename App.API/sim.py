@@ -48,6 +48,7 @@ class Agent(arcade.Sprite):
             case _ if self.nearby_agents > 2:
                 arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 4, (255, 150, 247))
 
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 10, (256, 0, 0))
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
         arcade.draw_line(self.center_x,
                     self.center_y,
