@@ -15,7 +15,7 @@ import random
 SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
 FPS = 30
-AGENT_RADIUS = 8
+AGENT_RADIUS = 2
 col_black = (0, 0, 0)
 
 animation = []
@@ -32,7 +32,7 @@ class Agent:
         self.pymunk_shape = pymunk_shape
         self.direction = 0
         self.target_direction = 0
-        self.magnitude = 20
+        self.magnitude = 100
 
     def update_vel(self):
         """update agent velocity"""
@@ -298,7 +298,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(16)
-    sim.flowfield.draw()
+    #sim.flowfield.draw()
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
