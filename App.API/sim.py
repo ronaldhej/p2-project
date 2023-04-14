@@ -9,6 +9,7 @@ import pyrender
 import io
 import math
 import random
+from time import perf_counter
 # import glcontext
 # Create a 100 x 100 headless window
 
@@ -272,8 +273,13 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     window.flowfield = flowfield
 
     for _ in range(runtime*FPS):
+        t_draw_start = perf_counter()
         sim_draw(window)
+        t_draw_stop = perf_counter()
+        t_update_start = perf_counter()
         sim_update(window)
+        t_update_stop = perf_counter()
+        print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t]')
     arcade.exit()
     arcade.close_window()
     print("sim end")
@@ -312,7 +318,15 @@ def sim_draw(sim: Simulator):
 def sim_update(sim: Simulator):
     """update step of simulation"""
     sim.space.step(1/FPS)
+    field_age = 0
     for person in sim.person_list:
+        
+        #update flow field every second
+        field_age += 1
+        if field_age > FPS:
+            sim.flowfield.update()
+            field_age = 0
+        
         xpos = person.pymunk_shape.body.position.x
         ypos = person.pymunk_shape.body.position.y
         person.center_x = xpos
