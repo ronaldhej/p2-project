@@ -16,7 +16,7 @@ from time import perf_counter
 SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
 FPS = 30
-AGENT_RADIUS = 2
+AGENT_RADIUS = 4
 col_black = (0, 0, 0)
 
 animation = []
@@ -68,7 +68,7 @@ class FlowField:
         self.cell_y: int = 0
         self.resolution = resolution
         self.field:list[list[Cell]] = []
-        self.destination_cell:tuple[int,int] = (8,8)
+        self.destination_cell:tuple[int,int] = (8,15)
 
     def setup(self):
         """initialize cell arrays"""
@@ -131,10 +131,6 @@ class FlowField:
                 ydir = best.y - cell.y
                 cell.direction = math.atan2(ydir,xdir)
 
-
-
-
-
     def get_cell(self, x, y) -> Cell:
         cell_x = int(x / self.cell_width)
         cell_y = int(y / self.cell_height)
@@ -172,7 +168,7 @@ class Simulator(arcade.Window):
         self.space.iterations = 5
         self.space.gravity = (0.0, 0.0)
         self.person_list = []
-        self.wall_list = []
+        self.wall_list:list[pymunk.Poly] = []
         self.total_time = 0.0
         self.static_lines = []
         self.animation = []
@@ -210,6 +206,28 @@ class Simulator(arcade.Window):
         shape.friction = 10
         self.space.add(shape, body)
         self.static_lines.append(shape)
+
+        wall_verts_list:list[list[tuple[float, float]]] = [
+                [
+                    (4,128-32),
+                    (256-32,128),
+                    (256-24, SPACE_HEIGHT - 64),
+                    (4,SPACE_HEIGHT - 32)
+                ],[
+                    (SPACE_WIDTH - 4,128-32),
+                    (256+32,128),
+                    (256+24, SPACE_HEIGHT - 64),
+                    (SPACE_WIDTH - 4,SPACE_HEIGHT - 32)
+                ]
+            ]
+        
+        for vs in wall_verts_list:
+            wall_body = pymunk.Body(body_type=pymunk.Body.STATIC)
+            wall_shape = pymunk.Poly(wall_body, vs)
+            wall_shape.friction = 10
+
+            self.space.add(wall_shape, wall_body)
+            self.wall_list.append(wall_shape)
     
     def on_draw(self):
         pass
@@ -247,10 +265,11 @@ class Simulator(arcade.Window):
         for i in range(self.agent_num):
             inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
             body = pymunk.Body(1,  inertia)
-            body.position = (SPACE_WIDTH / 2) + (random.random()-0.5)*256, (SPACE_HEIGHT / 2) + (random.random()-0.5)*256
+            body.position = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
             shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
             shape.friction = 0.3
             person = Agent(shape, (231, 191, 14))
+            person.direction = random.randrange(0,2) * math.pi
             self.space.add(body, shape)
             self.person_list.append(person)
 
@@ -308,7 +327,12 @@ def sim_draw(sim: Simulator):
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
-        wall.draw()
+        #wall.draw()
+        vs = wall.get_vertices()
+        for v in vs:
+            x,y = v.rotated(wall.body.angle) + wall.body.position
+            v = (int(x), int(y))
+        arcade.draw_polygon_outline(vs, (255,255,255),1)
     for line in sim.static_lines:
         body = line.body
         pv1 = body.position + line.a.rotated(body.angle)
