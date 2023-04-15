@@ -33,7 +33,7 @@ class Agent:
         self.pymunk_shape = pymunk_shape
         self.direction = 0
         self.target_direction = 0
-        self.magnitude = 100
+        self.magnitude = 25
 
     def update_vel(self):
         """update agent velocity"""
@@ -153,8 +153,8 @@ class FlowField:
                                  center_y,
                                  center_x+math.cos(cell.direction)*8,
                                  center_y+math.sin(cell.direction)*8,
-                                 (255,255,255),1)
-                if cell.cost < 65535: arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
+                                 color,1)
+                #if cell.cost < 65535: arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
             #arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
 
 class Simulator(arcade.Window):
@@ -169,7 +169,7 @@ class Simulator(arcade.Window):
         self.runtime = runtime
         #space
         self.space = pymunk.Space()
-        self.space.iterations = 35
+        self.space.iterations = 5
         self.space.gravity = (0.0, 0.0)
         self.person_list = []
         self.wall_list = []
@@ -303,8 +303,8 @@ def draw_grid(res: int):
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    #draw_grid(16)
-    #sim.flowfield.draw()
+    draw_grid(sim.flowfield.resolution)
+    sim.flowfield.draw()
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
