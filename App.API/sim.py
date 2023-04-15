@@ -39,7 +39,7 @@ class Agent:
         """update agent velocity"""
         self.pymunk_shape.body.velocity = (math.cos(self.direction)*self.magnitude,
                                            math.sin(self.direction)*self.magnitude)
-
+        
     def draw(self):
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
         # arcade.draw_line(self.center_x,
@@ -48,6 +48,7 @@ class Agent:
         #             self.center_y+math.sin(self.direction)*16,
         #             (0,0,255),2)
 
+MAX_COST = 65535
 class Cell:
     def __init__(self, x:int, y:int) -> None:
         self.direction = 0
@@ -68,18 +69,30 @@ class FlowField:
         self.cell_y: int = 0
         self.resolution = resolution
         self.field:list[list[Cell]] = []
-        self.destination_cell:tuple[int,int] = (8,15)
+        self.destination_cell:tuple[int,int] = (4,15)
 
-    def setup(self):
+    def setup(self, wall_list: list[pymunk.Poly]):
         """initialize cell arrays"""
-        self.cell_width = round(self.width/16)
-        self.cell_height = round(self.width/16)
+        print("setting up flowfield")
+        self.cell_width = round(self.width/self.resolution)
+        self.cell_height = round(self.width/self.resolution)
         self.field = [[Cell]*self.resolution for _ in range(self.resolution)]
         for i in range(self.resolution):
             for j in range(self.resolution):
+                print("initializing cell: ", i,j)
                 new_cell:Cell = Cell(i,j)
                 new_cell.direction = math.radians(random.random()*360)
+                
+                for w in wall_list:
+                    point = (i*self.cell_width + (self.cell_width/2), j*self.cell_width + (self.cell_width/2))
+                    if w.point_query(point).distance < 0:
+                        new_cell.cost = MAX_COST + 1
+
                 self.field[i][j] = new_cell
+        
+        
+        #add neighbors
+        print("adding neighbors")
         for x in range(self.resolution):
             for y in range(self.resolution):
                 cell:Cell = self.field[x][y]
@@ -103,6 +116,7 @@ class FlowField:
                 if cell.x < self.resolution-1 and cell.y < self.resolution-1:       cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
             
     def update(self):
+        print("updating up flowfield")
         (dest_x, dest_y) = self.destination_cell
         open_list:list[Cell] = []
         current_cell:Cell = None
@@ -112,15 +126,19 @@ class FlowField:
                 if cell == self.field[dest_x][dest_y]:
                     cell.cost = 0
                     open_list.append(cell)
-                else:
-                    cell.cost = 65535
+                elif cell.cost <= MAX_COST:
+                    cell.cost = MAX_COST
+        print("openlisting")
         while len(open_list) > 0:
             current_cell:Cell = open_list.pop(0)
             for cell in current_cell.neighbors[:current_cell.direct_neighbors]:
-                if cell not in open_list and cell.cost >= 65535:
+                if cell.cost > MAX_COST:
+                    continue
+                if cell not in open_list and cell.cost == MAX_COST:
                     open_list.append(cell)
                 new_cost:int = current_cell.cost + cell.weight
                 if new_cost < cell.cost: cell.cost = new_cost
+        print("calculating directions")
         for i in range(self.resolution):
             for j in range(self.resolution):
                 cell = self.field[i][j]
@@ -132,8 +150,8 @@ class FlowField:
                 cell.direction = math.atan2(ydir,xdir)
 
     def get_cell(self, x, y) -> Cell:
-        cell_x = int(x / self.cell_width)
-        cell_y = int(y / self.cell_height)
+        cell_x:int = math.floor(x / self.cell_width)
+        cell_y:int = math.floor(y / self.cell_height)
         return self.field[cell_x][cell_y]
 
     def draw(self):
@@ -142,15 +160,15 @@ class FlowField:
                 cell:Cell = self.field[x][y]
                 center_x = self.cell_width*cell.x + self.cell_width/2
                 center_y = self.cell_height*cell.y + self.cell_height/2
-                color:arcade.Color = (int(cell.cost/16*255),55,55)
+                color:arcade.Color = (0,int(cell.cost/self.resolution*255),255-int(cell.cost/self.resolution*255)) if cell.cost <= MAX_COST else (255,55,55)
                 if (x,y) == self.destination_cell:
-                    color = (255,0,0)
+                    color = (255,255,255)
                 arcade.draw_line(center_x,
                                  center_y,
                                  center_x+math.cos(cell.direction)*8,
                                  center_y+math.sin(cell.direction)*8,
                                  color,1)
-                #if cell.cost < 65535: arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
+                #arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
             #arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
 
 class Simulator(arcade.Window):
@@ -231,35 +249,9 @@ class Simulator(arcade.Window):
     
     def on_draw(self):
         pass
-        # self.clear()
-        # for person in self.person_list:
-        #     person.draw()
-        # for wall in self.wall_list:
-        #     wall.draw()
-        # for line in self.static_lines:
-        #     body = line.body
-        #     pv1 = body.position + line.a.rotated(body.angle)
-        #     pv2 = body.position + line.b.rotated(body.angle)
-        #     arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
 
     def on_update(self, dt):
         pass
-        # if self.total_time >= self.runtime:
-        #     frame_image = arcade.get_image(0, 0, *self.get_size())
-        #     self.animation.append(frame_image)
-        #     arcade.exit()
-        # else:
-        #     #frame_image.save("framebuffer.png")
-            
-        #     self.total_time += dt
-        #     self.space.step(1/FPS)
-        #     for person in self.person_list:
-        #         person.center_x = person.pymunk_shape.body.position.x
-        #         person.center_y = person.pymunk_shape.body.position.y
-        #         person.angle = math.degrees(person.pymunk_shape.body.angle)
-
-        #     frame_image = arcade.get_image(0, 0, *self.get_size())
-        #     self.animation.append(frame_image)
 
     def setup(self):
         for i in range(self.agent_num):
@@ -286,7 +278,7 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     print("sim start")
     # arcade.run()
     flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution)
-    flowfield.setup()
+    flowfield.setup(window.wall_list)
     flowfield.update()
 
     window.flowfield = flowfield
@@ -322,7 +314,7 @@ def draw_grid(res: int):
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    draw_grid(sim.flowfield.resolution)
+    #draw_grid(sim.flowfield.resolution)
     sim.flowfield.draw()
     for person in sim.person_list:
         person.draw()
@@ -348,7 +340,7 @@ def sim_update(sim: Simulator):
         #update flow field every second
         field_age += 1
         if field_age > FPS:
-            sim.flowfield.update()
+            #sim.flowfield.update()
             field_age = 0
         
         xpos = person.pymunk_shape.body.position.x
@@ -356,14 +348,16 @@ def sim_update(sim: Simulator):
         person.center_x = xpos
         person.center_y = ypos
         #person.angle = math.degrees(person.pymunk_shape.body.angle)
-        person.target_direction = sim.flowfield.get_cell(xpos, ypos).direction
+        if xpos > 0 and xpos < SPACE_WIDTH and ypos > 0 and ypos < SPACE_HEIGHT:
+            person.target_direction = sim.flowfield.get_cell(xpos, ypos).direction
+        else:
+            pass #TODO set direction to center of space
 
         diff = ( person.target_direction - person.direction + math.pi ) % (2*math.pi) - math.pi
         if diff < -math.pi:
             diff = diff + 360
         person.direction = person.direction + (diff)*0.1
         person.update_vel()
-
 
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
