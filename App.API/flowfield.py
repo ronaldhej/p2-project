@@ -106,6 +106,7 @@ class FlowField:
                 if cell.x > 0 and cell.y < self.resolution-1:                       cell.neighbors.append(self.field[cell.x - 1][cell.y + 1])
                 if cell.x < self.resolution-1 and cell.y < self.resolution-1:       cell.neighbors.append(self.field[cell.x + 1][cell.y + 1])
 
+        self.update()
 
     def update(self):
         '''

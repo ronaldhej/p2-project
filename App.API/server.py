@@ -43,9 +43,6 @@ async def run_sim(request: SimRequestDto):
     """post"""
     print("simulate")
     try:
-
-        # buf = io.BytesIO()
-        # image.save(buf, "GIF")
         image_buffer = sim.run_agent_sim(60, False, request.agent_num, request.runtime, 32)
 
         image_buffer.seek(0)  # important here!

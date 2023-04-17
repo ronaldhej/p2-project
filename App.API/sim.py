@@ -12,7 +12,6 @@ import random
 from flowfield import FlowField
 from time import perf_counter
 # import glcontext
-# Create a 100 x 100 headless window
 
 SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
@@ -163,7 +162,6 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     # arcade.run()
     flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution)
     flowfield.setup(window.wall_list)
-    flowfield.update()
 
     window.flowfield = flowfield
 
@@ -200,11 +198,10 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
-    sim.flowfield.draw()
+    #sim.flowfield.draw()
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
-        #wall.draw()
         vs = wall.get_vertices()
         for v in vs:
             x,y = v.rotated(wall.body.angle) + wall.body.position
