@@ -269,7 +269,6 @@ def sim_update(sim: Simulator):
     for person in sim.person_list:
         person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
         person.nearby_agents = len(person_near_list)
-        print(person.nearby_agents)
         person.center_x = person.pymunk_shape.body.position.x
         person.center_y = person.pymunk_shape.body.position.y
         person.angle = math.degrees(person.pymunk_shape.body.angle)
