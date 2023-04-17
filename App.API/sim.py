@@ -38,6 +38,18 @@ class Agent(arcade.Sprite):
         self.nearby_agents = 0
 
     def draw(self):
+        #Personal Space Circle
+        match self.nearby_agents:
+            case 0:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (0, 255, 0))
+            case 1:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 255, 0))
+            case 2:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 150, 0))
+            case 3:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 100, 0))
+            case _:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 0, 0))
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
         arcade.draw_line(self.center_x,
                     self.center_y,
@@ -99,7 +111,6 @@ class FlowField:
             # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
 
 
-
 class Simulator(arcade.Window):
     #Initializing states for the game
     def __init__(self, agent_num, runtime, multithreaded:bool):
@@ -121,9 +132,6 @@ class Simulator(arcade.Window):
         self.animation = []
         self.flowfield:FlowField = None
         self.space.collision_slop = 0
-
-        self.person_sprite_list =  None
-        self.person_sprite = None
 
         #enable multithreading on other platforms than windows
         if sys.platform != "Win32" and multithreaded:
@@ -273,7 +281,6 @@ def sim_update(sim: Simulator):
         person.direction = person.direction + (diff)*0.1
         person.pymunk_shape.body.velocity = (math.cos(person.direction)*person.magnitude, 
                                              math.sin(person.direction)*person.magnitude)
-
         
         
 
