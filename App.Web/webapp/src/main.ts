@@ -36,7 +36,8 @@ function postSimRequest(simRequest: SimRequestDto) {
   
   const result = axios.post("http://127.0.0.1:8000/simulate", simRequest).then(res => {
     let b64_gif: string = "data:image/gif;base64,";
-    b64_gif += res.data.image_gif;
+    b64_gif += res.data.sim_data[0];
+    console.log(res.data.sim_data[1])
 
     preview!.src = b64_gif;
     preview!.style.opacity = "1";

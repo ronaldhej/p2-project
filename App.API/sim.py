@@ -21,6 +21,11 @@ col_black = (0, 0, 0)
 
 animation = []
 
+class DensityData:
+    def __init__(self, step, value):
+        self.step = step
+        self.value = value
+
 class Agent(arcade.Sprite):
     def __init__(self, pymunk_shape, color):
         super().__init__(center_x = pymunk_shape.body.position.x, center_y = pymunk_shape.body.position.y)
@@ -125,10 +130,14 @@ class Simulator(arcade.Window):
         self.space = pymunk.Space()
         self.space.iterations = 35
         self.space.gravity = (0.0, 0.0)
+        #Object Lists
         self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
         self.wall_list = []
-        self.total_time = 0.0
+        #Data
+        self.density_data = []
         self.static_lines = []
+        self.total_time = 0.0
+        self.total_steps = 0
         self.animation = []
         self.flowfield:FlowField = None
 
@@ -214,7 +223,7 @@ class Scenario:
         pass
 
 
-def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
+def run_agent_sim(frames, save, agent_num, runtime, resolution) -> tuple[io.BytesIO, list[DensityData]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
     window.setup()
@@ -241,7 +250,7 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
                              optimize=True,
                              duration=1000/30,
                              loop=0)
-    return buffer
+    return buffer, window.density_data
 
 def draw_grid(res: int):
     for i in range(res):
@@ -266,9 +275,13 @@ def sim_draw(sim: Simulator):
 def sim_update(sim: Simulator):
     """update step of simulation"""
     sim.space.step(1/FPS)
+    sim.total_steps += 1
+    step_density_vals = []
     for person in sim.person_list:
         person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
         person.nearby_agents = len(person_near_list)
+        step_density_vals.append(person.nearby_agents)
+
         person.center_x = person.pymunk_shape.body.position.x
         person.center_y = person.pymunk_shape.body.position.y
         person.angle = math.degrees(person.pymunk_shape.body.angle)
@@ -281,8 +294,8 @@ def sim_update(sim: Simulator):
         person.direction = person.direction + (diff)*0.1
         person.pymunk_shape.body.velocity = (math.cos(person.direction)*person.magnitude, 
                                              math.sin(person.direction)*person.magnitude)
-        
-        
-
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
+    density_data = DensityData(sim.total_steps, max(step_density_vals))
+    sim.density_data.append(density_data)
+    
