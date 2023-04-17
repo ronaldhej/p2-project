@@ -16,6 +16,7 @@ SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
 FPS = 30
 AGENT_RADIUS = 8
+PERSONAL_SPACE = 4
 col_black = (0, 0, 0)
 
 animation = []
@@ -40,15 +41,15 @@ class Agent(arcade.Sprite):
         #Personal Space Circle
         match self.nearby_agents:
             case 0:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 4, (255, 0, 247))
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (0, 255, 0))
             case 1:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 4, (255, 50, 247))
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 255, 0))
             case 2:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 4, (255, 100, 247))
-            case _ if self.nearby_agents > 2:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 4, (255, 150, 247))
-
-        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + 10, (256, 0, 0))
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 150, 0))
+            case 3:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 100, 0))
+            case _:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 0, 0))
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
         arcade.draw_line(self.center_x,
                     self.center_y,
@@ -80,7 +81,7 @@ class FlowField:
         self.cell_width = round(self.width/16)
         self.cell_height = round(self.width/16)
         self.field = [[None]*self.resolution for i in range(self.resolution)]
-        print(self.cell_width)
+        ##print(self.cell_width)
         for i in range(self.resolution):
             for j in range(self.resolution):
                 new_cell:Cell = Cell(i,j)
@@ -93,7 +94,7 @@ class FlowField:
     def get_cell(self, x, y) -> Cell:
         cell_x = int(x / self.cell_width)
         cell_y = int(y / self.cell_height)
-        print(cell_x, cell_y)
+        ##print(cell_x, cell_y)
         return self.field[cell_x][cell_y]
 
     def draw(self):
@@ -124,7 +125,7 @@ class Simulator(arcade.Window):
         self.space = pymunk.Space()
         self.space.iterations = 35
         self.space.gravity = (0.0, 0.0)
-        self.person_list = arcade.SpriteList(use_spatial_hash=True)
+        self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
         self.wall_list = []
         self.total_time = 0.0
         self.static_lines = []
@@ -266,8 +267,9 @@ def sim_update(sim: Simulator):
     """update step of simulation"""
     sim.space.step(1/FPS)
     for person in sim.person_list:
-        agent_collision_list = arcade.check_for_collision_with_lists(person, sim.person_list)
-        person.nearby_agents = agent_collision_list.len()
+        person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
+        person.nearby_agents = len(person_near_list)
+        print(person.nearby_agents)
         person.center_x = person.pymunk_shape.body.position.x
         person.center_y = person.pymunk_shape.body.position.y
         person.angle = math.degrees(person.pymunk_shape.body.angle)
