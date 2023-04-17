@@ -109,7 +109,7 @@ class FlowField:
                                  center_y+math.sin(cell.direction)*8,
                                  (255,255,255),1)
             # arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
-
+        
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -131,6 +131,7 @@ class Simulator(arcade.Window):
         self.static_lines = []
         self.animation = []
         self.flowfield:FlowField = None
+
         self.space.collision_slop = 0
 
         #enable multithreading on other platforms than windows
@@ -206,8 +207,7 @@ class Simulator(arcade.Window):
             person = Agent(shape, (231, 191, 14))
             self.space.add(body, shape)
             self.person_list.append(person)
-        self.person_sprite_list = arcade.SpriteList()
-        self.person_sprite_list.append(self.person_sprite)
+
 
 class Scenario:
     def __init__(self, agent_num, runtime) -> None:
@@ -269,6 +269,7 @@ def sim_update(sim: Simulator):
     for person in sim.person_list:
         person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
         person.nearby_agents = len(person_near_list)
+        print(person.nearby_agents)
         person.center_x = person.pymunk_shape.body.position.x
         person.center_y = person.pymunk_shape.body.position.y
         person.angle = math.degrees(person.pymunk_shape.body.angle)
