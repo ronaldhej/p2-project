@@ -10,7 +10,9 @@ import io
 import math
 import random
 from flowfield import FlowField
+import utility
 from time import perf_counter
+from colorsys import hsv_to_rgb
 # import glcontext
 
 SPACE_WIDTH = 512
@@ -18,7 +20,7 @@ SPACE_HEIGHT = 512
 FPS = 30
 
 AGENT_RADIUS = 2
-PERSONAL_SPACE = 4
+PERSONAL_SPACE = 3
 col_black = (0, 0, 0)
 
 animation = []
@@ -47,18 +49,9 @@ class Agent(arcade.Sprite):
         
     def draw(self):
         #Personal Space Circle
-        match self.nearby_agents:
-            case 0:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (0, 255, 0))
-            case 1:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 255, 0))
-            case 2:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 150, 0))
-            case 3:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 100, 0))
-            case _:
-                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 0, 0))
-        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
+        risk = self.nearby_agents / 7
+        color = utility.heatmap_rgb(risk)
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, color)
 
 class Simulator(arcade.Window):
     #Initializing states for the game
