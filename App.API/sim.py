@@ -16,12 +16,14 @@ SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
 FPS = 30
 AGENT_RADIUS = 8
+PERSONAL_SPACE = 4
 col_black = (0, 0, 0)
 
 animation = []
 
-class Agent:
+class Agent(arcade.Sprite):
     def __init__(self, pymunk_shape, color):
+        super().__init__(center_x = pymunk_shape.body.position.x, center_y = pymunk_shape.body.position.y)
         self.center_x = pymunk_shape.body.position.x
         self.center_y = pymunk_shape.body.position.y
         self.radius = pymunk_shape.radius
@@ -33,13 +35,26 @@ class Agent:
         self.direction = 0
         self.target_direction = 0
         self.magnitude = 20
+        self.nearby_agents = 0
 
     def draw(self):
+        #Personal Space Circle
+        match self.nearby_agents:
+            case 0:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (0, 255, 0))
+            case 1:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 255, 0))
+            case 2:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 150, 0))
+            case 3:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 100, 0))
+            case _:
+                arcade.draw_circle_filled(self.center_x, self.center_y, self.radius + PERSONAL_SPACE, (255, 0, 0))
         arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, self.color)
         arcade.draw_line(self.center_x,
                     self.center_y,
-                    self.center_x+math.cos(self.direction)*16,
-                    self.center_y+math.sin(self.direction)*16,
+                    self.center_x+math.cos(self.direction)*4,
+                    self.center_y+math.sin(self.direction)*4,
                     (0,0,255),2)
 
 class Cell:
@@ -66,7 +81,7 @@ class FlowField:
         self.cell_width = round(self.width/16)
         self.cell_height = round(self.width/16)
         self.field = [[None]*self.resolution for i in range(self.resolution)]
-        print(self.cell_width)
+        ##print(self.cell_width)
         for i in range(self.resolution):
             for j in range(self.resolution):
                 new_cell:Cell = Cell(i,j)
@@ -79,7 +94,7 @@ class FlowField:
     def get_cell(self, x, y) -> Cell:
         cell_x = int(x / self.cell_width)
         cell_y = int(y / self.cell_height)
-        print(cell_x, cell_y)
+        ##print(cell_x, cell_y)
         return self.field[cell_x][cell_y]
 
     def draw(self):
@@ -110,7 +125,7 @@ class Simulator(arcade.Window):
         self.space = pymunk.Space()
         self.space.iterations = 35
         self.space.gravity = (0.0, 0.0)
-        self.person_list = []
+        self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
         self.wall_list = []
         self.total_time = 0.0
         self.static_lines = []
@@ -236,8 +251,8 @@ def draw_grid(res: int):
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    #draw_grid(16)
-    #sim.flowfield.draw()
+    draw_grid(16)
+    sim.flowfield.draw()
     for person in sim.person_list:
         person.draw()
     for wall in sim.wall_list:
@@ -252,6 +267,9 @@ def sim_update(sim: Simulator):
     """update step of simulation"""
     sim.space.step(1/FPS)
     for person in sim.person_list:
+        person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
+        person.nearby_agents = len(person_near_list)
+        print(person.nearby_agents)
         person.center_x = person.pymunk_shape.body.position.x
         person.center_y = person.pymunk_shape.body.position.y
         person.angle = math.degrees(person.pymunk_shape.body.angle)
@@ -264,6 +282,7 @@ def sim_update(sim: Simulator):
         person.direction = person.direction + (diff)*0.1
         person.pymunk_shape.body.velocity = (math.cos(person.direction)*person.magnitude, 
                                              math.sin(person.direction)*person.magnitude)
+        
         
 
     frame_image = arcade.get_image(0, 0, *sim.get_size())
