@@ -1,2 +1,5 @@
 
 App.API/framebuffer.png
+
+App.API/__pycache__/
+venv/

@@ -6,7 +6,10 @@ import './simulationDtos'
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   ${navbar()}
   <div id="content">
-    <img id="img-preview" src="./placeholder.png">
+    <div id="image-area">
+    <img id="img-preview" src="./placeholder.png">  
+    <img id="img-graph" src="./placeholder.png">
+    </div>
     <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
@@ -18,6 +21,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 const elApp: HTMLElement            | null = document.getElementById("app");
 const preview: HTMLImageElement     | null = document.getElementById("img-preview") as HTMLImageElement;
 const imgLoading: HTMLImageElement  | null = document.getElementById("loading") as HTMLImageElement;
+const graphImage: HTMLImageElement  | null = document.getElementById("img-graph") as HTMLImageElement;
 
 //simulation input
 const simAgentNum: HTMLInputElement | null = document.getElementById("simAgentNum") as HTMLInputElement;
@@ -38,6 +42,11 @@ function postSimRequest(simRequest: SimRequestDto) {
     let b64_gif: string = "data:image/gif;base64,";
     b64_gif += res.data.sim_data[0];
     console.log(res.data.sim_data[1])
+    
+    let graphPic: string = "data:image/png;base64,";
+    graphPic += res.data.sim_data[2];
+
+    graphImage!.src = graphPic;
 
     preview!.src = b64_gif;
     preview!.style.opacity = "1";
