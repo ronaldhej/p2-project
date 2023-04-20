@@ -10,7 +10,7 @@ type EntityDto = {
     color?: string
 }
 
-interface SimRequestDto {
+export interface SimRequestDto {
     agent_num: number,
     runtime: number,
     map?: [EntityDto]

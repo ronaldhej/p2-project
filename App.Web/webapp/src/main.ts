@@ -1,7 +1,7 @@
 import './style.css'
-import axios, { AxiosHeaders } from 'axios'
-import navbar, { setupNavbar } from './navbar'
-import './simulationDtos'
+import axios from 'axios'
+import navbar from './navbar'
+import { SimRequestDto } from './simulationDtos'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   ${navbar()}
@@ -15,7 +15,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 `
 //setupNavbar();
 
-const elApp: HTMLElement            | null = document.getElementById("app");
+//const elApp: HTMLElement            | null = document.getElementById("app");
 const preview: HTMLImageElement     | null = document.getElementById("img-preview") as HTMLImageElement;
 const imgLoading: HTMLImageElement  | null = document.getElementById("loading") as HTMLImageElement;
 
@@ -25,11 +25,11 @@ const simRuntime: HTMLInputElement  | null = document.getElementById("simRuntime
 const getSimBtn: HTMLButtonElement  | null = document.getElementById("form-sim-btn") as HTMLButtonElement;
 
 
-function testSim(simRequest: SimRequestDto) {
+/*function testSim(simRequest: SimRequestDto) {
   axios("http://127.0.0.1:8000/simulate", {method: 'post', data: JSON.stringify(simRequest)}).then(res => {
     console.log(res.data);
   })
-}
+}*/
 
 function postSimRequest(simRequest: SimRequestDto) {
   if (imgLoading) imgLoading.style.opacity = "1";
@@ -50,7 +50,7 @@ function postSimRequest(simRequest: SimRequestDto) {
 }
 
 
-function getSimulation() {
+/*function getSimulation() {
   console.log("fetching simulation");
 
   if (imgLoading) imgLoading.style.opacity = "1";
@@ -82,7 +82,7 @@ let testObj: SimRequestDto = {
       "color": "White"
     }
   ]
-}
+}*/
 
 getSimBtn.addEventListener('click', e => {
   e.preventDefault()

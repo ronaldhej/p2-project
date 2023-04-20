@@ -25,7 +25,7 @@ WORKDIR /the/workdir/path/App.Web/webapp
 COPY App.Web/webapp/package*.json ./
 RUN npm install
 COPY App.Web/webapp/. ./
-#RUN npm run dev
+RUN npm run build
 
 # Copy the built frontend to the static folder
 WORKDIR /the/workdir/path
