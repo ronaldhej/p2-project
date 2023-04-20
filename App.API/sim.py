@@ -156,6 +156,11 @@ class Simulator(arcade.Window):
 
 class Scenario:
     def __init__(self, agent_num, runtime) -> None:
+        self.agent_num = agent_num
+        self.runtime = runtime
+        self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
+        self.wall_list: list[pymunk.Poly] = []
+        self.static_lines = []
         pass
 
 

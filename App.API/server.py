@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+import pymunk
 import base64
 import json
 
@@ -25,6 +26,14 @@ class SimRequestDto(BaseModel):
     agent_num: int | None = 1
     runtime: int | None = 10
     map: list[CanvasEntityDto] | None = None
+
+class ScenarioDto:
+    def __init__(self, agent_num, runtime) -> None:
+        self.agent_num = agent_num
+        self.runtime = runtime
+        self.wall_list: list[pymunk.Poly] = []
+        self.static_lines = []
+        pass
 
 app = FastAPI()
 
