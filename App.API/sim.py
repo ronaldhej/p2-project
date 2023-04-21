@@ -26,7 +26,7 @@ col_black = (0, 0, 0)
 animation = []
 
 class Agent(arcade.Sprite):
-    def __init__(self, pymunk_shape, color):
+    def __init__(self, pymunk_shape, color, field_id):
         super().__init__(center_x = pymunk_shape.body.position.x, center_y = pymunk_shape.body.position.y)
         self.center_x = pymunk_shape.body.position.x
         self.center_y = pymunk_shape.body.position.y
@@ -40,6 +40,7 @@ class Agent(arcade.Sprite):
         self.target_direction = 0
         self.magnitude = 20
         self.nearby_agents = 0
+        self.field_id = field_id
 
 
     def update_vel(self):
@@ -72,8 +73,7 @@ class Simulator(arcade.Window):
         self.total_time = 0.0
         self.static_lines = []
         self.animation = []
-        self.flowfield:FlowField = None
-
+        self.field_list:list[FlowField] = []
         self.space.collision_slop = 0
 
         #enable multithreading on other platforms than windows
@@ -143,12 +143,20 @@ class Simulator(arcade.Window):
 
     def setup(self):
         for i in range(self.agent_num):
+            if i%2==0:    
+                field_id = 0
+                pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
+            else:
+                field_id = 1
+                pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, SPACE_HEIGHT - (random.random()-0.5)*16 - 32
+            
+
             inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
             body = pymunk.Body(1,  inertia)
-            body.position = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
+            body.position = pos
             shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
             shape.friction = 0.3
-            person = Agent(shape, (231, 191, 14))
+            person = Agent(shape, (231, 191, 14), 0)
             person.direction = random.randrange(0,2) * math.pi
             self.space.add(body, shape)
             self.person_list.append(person)
@@ -165,10 +173,12 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     window.setup()
     print("sim start")
     # arcade.run()
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution)
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (6,30))
     flowfield.setup(window.wall_list)
-
-    window.flowfield = flowfield
+    window.field_list.append(flowfield)
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (3,1))
+    flowfield.setup(window.wall_list)
+    window.field_list.append(flowfield)
 
     f_end = runtime*FPS
     for f in range(runtime*FPS):
@@ -237,7 +247,8 @@ def sim_update(sim: Simulator):
         person.center_y = ypos
         #person.angle = math.degrees(person.pymunk_shape.body.angle)
         if xpos > 0 and xpos < SPACE_WIDTH and ypos > 0 and ypos < SPACE_HEIGHT:
-            person.target_direction = sim.flowfield.get_cell(xpos, ypos).direction
+            field = sim.field_list[person.field_id]
+            person.target_direction = field.get_cell(xpos, ypos).direction
         else:
             pass #TODO set direction to center of space
 

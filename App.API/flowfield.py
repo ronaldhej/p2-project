@@ -43,7 +43,7 @@ class FlowField:
         resolution  (int) desired amount of columns/rows
 
     '''
-    def __init__(self, width: int, height: int, resolution: int) -> None:
+    def __init__(self, width: int, height: int, resolution: int, dest:tuple[int,int]) -> None:
         self.width = width
         self.height = height
         self.cell_width: int = 0
@@ -52,7 +52,7 @@ class FlowField:
         self.cell_y: int = 0
         self.resolution = resolution
         self.field:list[list[Cell]] = []
-        self.destination_cell:tuple[int,int] = (6,30)
+        self.destination_cell:tuple[int,int] = dest
 
 
     def setup(self, wall_list: list[pymunk.Poly]):
