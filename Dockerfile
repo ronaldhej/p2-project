@@ -9,6 +9,9 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+# Install http-server
+RUN npm install -g http-server
+
 # Set the working directory
 WORKDIR /the/workdir/path
 
@@ -18,21 +21,20 @@ RUN pip install -r requirements.txt
 COPY App.API .
 
 # Copy the frontend code
-COPY App.Web/webapp .
+COPY App.Web/webapp ./webapp
 
 # Install frontend dependencies and build the app
-WORKDIR /the/workdir/path/App.Web/webapp
-COPY App.Web/webapp/package*.json ./
+WORKDIR /the/workdir/path/webapp
 RUN npm install
-COPY App.Web/webapp/. ./
 RUN npm run build
 
 # Copy the built frontend to the static folder
 WORKDIR /the/workdir/path
-RUN mkdir -p ./static && cp -R ./App.Web/webapp/* ./static
+RUN mkdir -p ./static && cp -R ./webapp/dist/* ./static
 
-# Expose the port
+# Expose the ports
 EXPOSE 8000
+EXPOSE 3000
 
-# Start the server
-CMD ["uvicorn", "server:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
+# Start the backend and frontend servers
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port 8000 & http-server ./static -p 3000"] 
