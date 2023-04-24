@@ -82,7 +82,6 @@ class FlowField:
 
 
         #add neighbors
-        print("adding neighbors")
         for x in range(self.resolution):
             for y in range(self.resolution):
                 cell:Cell = self.field[x][y]

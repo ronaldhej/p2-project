@@ -77,7 +77,7 @@ class Simulator(arcade.Window):
         self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
 
         #Data
-        self.density_data = []
+        self.density_data:list[float] = []
         self.wall_list:list[pymunk.Poly] = []
         self.total_time = 0.0
         self.static_lines = []
@@ -171,7 +171,7 @@ class Scenario:
         pass
 
 
-def run_agent_sim(frames, save, agent_num, runtime, resolution) -> tuple[io.BytesIO, list[DensityData]]:
+def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[float]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
     window.setup()
@@ -204,6 +204,7 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> tuple[io.Byte
                              optimize=True,
                              duration=1000/30,
                              loop=0)
+    window.density_data = [round(random.random()*7.0) for _ in range(120)]
     return buffer, window.density_data
 
 def draw_grid(res: int):
