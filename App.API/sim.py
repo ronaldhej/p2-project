@@ -9,7 +9,10 @@ import pyrender
 import io
 import math
 import random
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
+from typing import List
 # import glcontext
 # Create a 100 x 100 headless window
 
@@ -300,17 +303,21 @@ def sim_update(sim: Simulator):
     density_data = DensityData(sim.total_steps, max(step_density_vals))
     sim.density_data.append(density_data)
     
-def graph() -> io.BytesIO:
-    x1 = [1,2,3]
-    y1 = [2,4,1]
-    plt.plot(x1, y1)
-  
+def graph(density_data: List[DensityData]) -> io.BytesIO:
+
+    # plot the density data
+    x_time = [entry.step/FPS for entry in density_data]
+    y_density = [entry.value for entry in density_data]
+    plt.plot(x_time, y_density, 'ro-', label='Density')
+
     plt.xlabel('Time')
     plt.ylabel('Max density')
     plt.title('Max density over time')
+    plt.legend()
 
     image_buffer = io.BytesIO()
-
     plt.savefig(image_buffer, format='png', bbox_inches='tight')
-
+    plt.close() # close the plot to avoid memory leaks
+    image_buffer.seek(0)
+    
     return image_buffer
