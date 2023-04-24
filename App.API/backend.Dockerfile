@@ -1,22 +1,22 @@
 FROM python:3.10
 
-# Install mesa-utils
+# Set up virtual display
+ENV DISPLAY=:99
+
+# Install Xvfb and other dependencies
 RUN apt-get update && \
-    apt-get install -y mesa-utils
+    apt-get install -y xvfb libgl1-mesa-glx && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set the working directory
+# Set up app
 WORKDIR /app
-
-# Copy the requirements file and install the dependencies
 COPY requirements.txt .
-RUN python -m venv venv
-RUN . venv/bin/activate
 RUN pip install -r requirements.txt
-
-# Copy the application code
 COPY . .
 
-# Expose the port and start the application
-EXPOSE 8000
-CMD ["bash", "-c", "source venv/bin/activate && exec uvicorn server:app --host 0.0.0.0 --port 8000"]
-
+# Start Xvfb and server
+CMD ["bash", "-c", "Xvfb $DISPLAY -screen 0 1024x768x24 > /dev/null 2>&1 & \
+                     sleep 1 && \
+                     source venv/bin/activate && \
+                     exec uvicorn server:app --host 0.0.0.0 --port 8000"]
