@@ -49,7 +49,7 @@ async def run_sim(request: SimRequestDto):
         image_buffer, density_data = sim.run_agent_sim(60, False, request.agent_num, request.runtime, 16)
         json_density_data = json.dumps([entry.__dict__ for entry in density_data])
 
-        graph_image = sim.graph(density_data) # Pass sim.animation to the function
+        graph_image = sim.graph(density_data) # Pass density_data to the function
         
         graph_image.seek(0)
         image_buffer.seek(0)  # important here!
@@ -63,7 +63,6 @@ async def run_sim(request: SimRequestDto):
     except Exception as error:
         print(error)
         return JSONResponse(content={"msg": "deez"}, status_code=500)
-
 
 @app.get("/")
 async def root():
