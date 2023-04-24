@@ -43,11 +43,11 @@ async def run_sim(request: SimRequestDto):
     """post"""
     print("simulate")
     try:
-
         # buf = io.BytesIO()
         # image.save(buf, "GIF")
         image_buffer, density_data = sim.run_agent_sim(60, False, request.agent_num, request.runtime, 16)
         json_density_data = json.dumps([entry.__dict__ for entry in density_data])
+
 
         graph_image = sim.graph()
 
