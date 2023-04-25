@@ -1,8 +1,5 @@
 import Chart from 'chart.js/auto'
 
-const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-gradient.addColorStop(0, 'rgba(250,174,50,1)');   
-gradient.addColorStop(1, 'rgba(250,174,50,0)');
 
 export default async function densityChart() {
   const data = [
@@ -26,7 +23,8 @@ export default async function densityChart() {
             label: 'density',
             data: data.map(row => row.count),
             fill: true,
-            backgroundColor: "#fffff",
+            backgroundColor: "#e44f2210",
+            borderColor: "#e44f22",
             tension: 0.1,
           }
         ]
