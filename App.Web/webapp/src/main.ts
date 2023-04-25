@@ -2,7 +2,7 @@ import './style.css'
 import axios, { AxiosHeaders } from 'axios'
 import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
-import densityChart from './densityChart'
+import setupChart from './densityChart'
 
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
@@ -19,8 +19,8 @@ ${navbar()}
     <canvas id="density-chart"></canvas>
     </div>
     `
-  //setupNavbar();
-densityChart();
+setupChart()
+//setupNavbar();
 const elApp: HTMLElement            | null = document.getElementById("app");
 const preview: HTMLImageElement     | null = document.getElementById("img-preview") as HTMLImageElement;
 const imgLoading: HTMLImageElement  | null = document.getElementById("loading") as HTMLImageElement;
