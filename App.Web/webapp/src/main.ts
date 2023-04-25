@@ -4,10 +4,11 @@ import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
 import densityChart from './densityChart'
 
+
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  ${navbar()}
-  <div id="content">
-    <div id="image-area">
+${navbar()}
+<div id="content">
+<div id="image-area">
     <img id="img-preview" src="./placeholder.png">  
     <img id="img-graph" src="./placeholder.png">
     </div>
@@ -15,12 +16,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
     <img src="https://play-lh.googleusercontent.com/3Yh-SDp6KUf0vaZrsy4zSf_Gk8e4AAV15aMdHB7pZKZ96vYKWpyh1CiVZLdER5OLabSw" id="loading">
-    <svg id="densityChart" width="200" height="200"></svg>  
+    <canvas id="density-chart"></canvas>
     </div>
-`
-//setupNavbar();
+    `
+  //setupNavbar();
 densityChart();
-
 const elApp: HTMLElement            | null = document.getElementById("app");
 const preview: HTMLImageElement     | null = document.getElementById("img-preview") as HTMLImageElement;
 const imgLoading: HTMLImageElement  | null = document.getElementById("loading") as HTMLImageElement;
