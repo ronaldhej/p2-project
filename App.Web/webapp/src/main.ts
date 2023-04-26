@@ -15,7 +15,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
-    <img src="https://play-lh.googleusercontent.com/3Yh-SDp6KUf0vaZrsy4zSf_Gk8e4AAV15aMdHB7pZKZ96vYKWpyh1CiVZLdER5OLabSw" id="loading">
     <canvas id="density-chart"></canvas>
   </div>
 `
@@ -25,7 +24,6 @@ setupChart();
 const elApp: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
 const progressBar: HTMLDivElement | null = document.getElementById("progress-bar") as HTMLDivElement;
-const imgLoading: HTMLImageElement | null = document.getElementById("loading") as HTMLImageElement;
 
 //simulation input
 const simAgentNum: HTMLInputElement | null = document.getElementById("simAgentNum") as HTMLInputElement;
@@ -40,7 +38,6 @@ function testSim(simRequest: SimRequestDto) {
 }
 
 function postSimRequest(simRequest: SimRequestDto) {
-  if (imgLoading) imgLoading.style.opacity = "1";
 
   const result = axios.post("http://127.0.0.1:8000/simulate", simRequest).then(res => {
     let b64_gif: string = "data:image/gif;base64,";
@@ -50,11 +47,9 @@ function postSimRequest(simRequest: SimRequestDto) {
 
     preview!.src = b64_gif;
     preview!.style.opacity = "1";
-    imgLoading!.style.opacity = "0";
 
 
   }).catch(err => {
-    if (imgLoading) imgLoading.style.opacity = "0";
     console.log("fetch failed: " + err.message);
   });
   console.log(result)
@@ -106,7 +101,6 @@ getSimBtn.addEventListener('click', e => {
         b64_gif += data.sim_gif;
         preview!.src = b64_gif;
         preview!.style.opacity = "1";
-        imgLoading!.style.opacity = "0";
         progressBar.style.opacity = "0"
         progressBar.style.width = "0px"
         break
