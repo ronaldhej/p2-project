@@ -6,7 +6,7 @@ import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.responses import JSONResponse
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
 import base64
@@ -41,6 +41,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    """get"""
+    return {"message": "Hello World"}
+
 @app.post("/simulate")
 async def run_sim(request: SimRequestDto):
     """post"""
@@ -60,10 +65,20 @@ async def run_sim(request: SimRequestDto):
         print(error)
         return JSONResponse(content={"msg": "deez"}, status_code=500)
 
-@app.get("/")
-async def root():
-    """get"""
-    return {"message": "Hello World"}
+@app.websocket("/ws")
+async def run_socket_sim(socket: WebSocket):
+    print("handling connection request")
+    await socket.accept()
+    print("connection established")
+    image_buffer, agent_amount_data = sim.run_agent_sim(60, False, 1, 4, 32)
+    image_buffer.seek(0)
+    buffer_bytes = image_buffer.getvalue()
+    buffer_base64 = base64.b64encode(buffer_bytes)
+    try:
+        await socket.send_json(data={"sim_gif": buffer_base64.decode('utf-8'), "density_data": agent_amount_data})
+        await socket.close()
+    except WebSocketDisconnect:
+        print("disconnected")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000, reload=DEV)
