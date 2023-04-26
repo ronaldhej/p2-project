@@ -1,6 +1,8 @@
 #import os
 #os.environ["ARCADE_HEADLESS"] = "true"
 
+import uvicorn
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.responses import JSONResponse
@@ -27,6 +29,7 @@ class SimRequestDto(BaseModel):
     map: list[CanvasEntityDto] | None = None
 
 app = FastAPI()
+DEV = True
 
 origins = ["*"]
 
@@ -61,3 +64,6 @@ async def run_sim(request: SimRequestDto):
 async def root():
     """get"""
     return {"message": "Hello World"}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000, reload=DEV)
