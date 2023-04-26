@@ -9,7 +9,7 @@ import pyrender
 import io
 import math
 import random
-from flowfield import FlowField
+from flowfield import FlowField, Cell
 import utility
 from time import perf_counter
 from colorsys import hsv_to_rgb
@@ -25,8 +25,13 @@ col_black = (0, 0, 0)
 
 animation = []
 
+class DensityData:
+    def __init__(self, step, value):
+        self.step = step
+        self.value = value
+
 class Agent(arcade.Sprite):
-    def __init__(self, pymunk_shape, color):
+    def __init__(self, pymunk_shape, color, field_id):
         super().__init__(center_x = pymunk_shape.body.position.x, center_y = pymunk_shape.body.position.y)
         self.center_x = pymunk_shape.body.position.x
         self.center_y = pymunk_shape.body.position.y
@@ -40,6 +45,7 @@ class Agent(arcade.Sprite):
         self.target_direction = 0
         self.magnitude = 20
         self.nearby_agents = 0
+        self.field_id = field_id
 
 
     def update_vel(self):
@@ -51,7 +57,7 @@ class Agent(arcade.Sprite):
         #Personal Space Circle
         risk = self.nearby_agents / 7
         color = utility.heatmap_rgb(risk)
-        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, color)
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, (228, 79, 34))
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -65,15 +71,20 @@ class Simulator(arcade.Window):
         self.runtime = runtime
         #space
         self.space = pymunk.Space()
-        self.space.iterations = 35
+        self.space.iterations = 100
         self.space.gravity = (0.0, 0.0)
+        #Object Lists
         self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
+
+        #Data
+        self.density_data:list[float] = []
         self.wall_list:list[pymunk.Poly] = []
         self.total_time = 0.0
         self.static_lines = []
+        self.total_time = 0.0
+        self.total_steps = 0
         self.animation = []
-        self.flowfield:FlowField = None
-
+        self.field_list:list[FlowField] = []
         self.space.collision_slop = 0
 
         #enable multithreading on other platforms than windows
@@ -124,16 +135,25 @@ class Simulator(arcade.Window):
         pass
 
     def setup(self):
-        for i in range(self.agent_num):
-            inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
-            body = pymunk.Body(1,  inertia)
-            body.position = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
-            shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
-            shape.friction = 0.3
-            person = Agent(shape, (231, 191, 14))
-            person.direction = random.randrange(0,2) * math.pi
-            self.space.add(body, shape)
-            self.person_list.append(person)
+        ...
+
+    def add_agent(self, frame):
+        if frame%2==0:    
+            field_id = 0
+            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
+        else:
+            field_id = 1
+            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, SPACE_HEIGHT - (random.random()-0.5)*16 - 32
+        
+        inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
+        body = pymunk.Body(1,  inertia)
+        body.position = pos
+        shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
+        shape.friction = 0.3
+        person = Agent(shape, (231, 191, 14), field_id)
+        person.direction = random.randrange(0,2) * math.pi
+        self.space.add(body, shape)
+        self.person_list.append(person)
 
 
 class Scenario:
@@ -141,7 +161,7 @@ class Scenario:
         pass
 
 
-def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
+def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
     window.add_wall([
@@ -163,19 +183,29 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     window.setup()
     
     print("sim start")
+    agent_num_list = []
     # arcade.run()
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution)
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (6,30))
     flowfield.setup(window.wall_list)
-
-    window.flowfield = flowfield
+    window.field_list.append(flowfield)
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (3,1))
+    flowfield.setup(window.wall_list)
+    window.field_list.append(flowfield)
 
     f_end = runtime*FPS
+    t_add = 1
     for f in range(runtime*FPS):
+        t_add -= 1
+        if t_add <= 0:
+            window.add_agent(f)
+            window.add_agent(f+1)
+            t_add = 1
         t_draw_start = perf_counter()
         sim_draw(window)
         t_draw_stop = perf_counter()
         t_update_start = perf_counter()
         sim_update(window)
+        agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
     arcade.exit()
@@ -191,7 +221,7 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
                              optimize=True,
                              duration=1000/30,
                              loop=0)
-    return buffer
+    return buffer, agent_num_list
 
 def draw_grid(res: int):
     for i in range(res):
@@ -202,7 +232,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
-    #sim.flowfield.draw()
+    #sim.field_list[1].draw()
 
     for person in sim.person_list:
         person.draw()
@@ -221,27 +251,38 @@ def sim_draw(sim: Simulator):
 def sim_update(sim: Simulator):
     """update step of simulation"""
     sim.space.step(1/FPS)
+    sim.total_steps += 1
+    step_density_vals = []
     field_age = 0
+    #update flow field every second
+    field_age += 1
+    if field_age > FPS:
+        for field in sim.field_list:
+            field.update()
+        field_age = 0
     for person in sim.person_list:
-
-        #update flow field every second
-        field_age += 1
-        if field_age > FPS:
-            sim.flowfield.update()
-            field_age = 0
         
         xpos = person.pymunk_shape.body.position.x
         ypos = person.pymunk_shape.body.position.y
         person.center_x = xpos
         person.center_y = ypos
+        dead = False
         #person.angle = math.degrees(person.pymunk_shape.body.angle)
         if xpos > 0 and xpos < SPACE_WIDTH and ypos > 0 and ypos < SPACE_HEIGHT:
-            person.target_direction = sim.flowfield.get_cell(xpos, ypos).direction
+            field = sim.field_list[person.field_id]
+            cell:Cell = field.get_cell(xpos, ypos)
+            person.target_direction = cell.direction
+            if cell.cost < 4:
+                dead = True
+                sim.space.remove(person.pymunk_shape, person.pymunk_shape.body)
+                sim.person_list.remove(person)
         else:
             pass #TODO set direction to center of space
 
-        person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
-        person.nearby_agents = len(person_near_list)
+        if dead:
+            continue
+        #person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
+        person.nearby_agents = 0#len(person_near_list)
         person.center_x = xpos
         person.center_y = ypos
         person.angle = math.degrees(person.pymunk_shape.body.angle)
@@ -252,5 +293,8 @@ def sim_update(sim: Simulator):
         person.direction = person.direction + (diff)*0.1
         person.update_vel()
 
+
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
+    #density_data = DensityData(sim.total_steps, max(step_density_vals))
+    #sim.density_data.append(density_data)

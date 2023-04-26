@@ -43,13 +43,16 @@ async def run_sim(request: SimRequestDto):
     """post"""
     print("simulate")
     try:
-        image_buffer = sim.run_agent_sim(60, False, request.agent_num, request.runtime, 32)
+        # buf = io.BytesIO()
+        # image.save(buf, "GIF")
+        image_buffer, agent_amount_data = sim.run_agent_sim(60, False, request.agent_num, request.runtime, 32)
+        print(agent_amount_data)
 
         image_buffer.seek(0)  # important here!
 
         buffer_bytes = image_buffer.getvalue()
         buffer_base64 = base64.b64encode(buffer_bytes)
-        return JSONResponse(content={"image_gif": buffer_base64.decode('utf-8')}, status_code=200)
+        return JSONResponse(content={"sim_gif": buffer_base64.decode('utf-8'), "density_data": agent_amount_data}, status_code=200)
     except Exception as error:
         print(error)
         return JSONResponse(content={"msg": "deez"}, status_code=500)

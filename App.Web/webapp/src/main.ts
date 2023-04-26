@@ -2,6 +2,7 @@ import './style.css'
 import axios, { AxiosHeaders } from 'axios'
 import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
+import setupChart from './densityChart'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   ${navbar()}
@@ -11,9 +12,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
     <img src="https://play-lh.googleusercontent.com/3Yh-SDp6KUf0vaZrsy4zSf_Gk8e4AAV15aMdHB7pZKZ96vYKWpyh1CiVZLdER5OLabSw" id="loading">
+    <canvas id="density-chart"></canvas>
   </div>
 `
 //setupNavbar();
+//setupChart([]);
 
 const elApp: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
@@ -36,7 +39,9 @@ function postSimRequest(simRequest: SimRequestDto) {
 
   const result = axios.post("http://127.0.0.1:8000/simulate", simRequest).then(res => {
     let b64_gif: string = "data:image/gif;base64,";
-    b64_gif += res.data.image_gif;
+    b64_gif += res.data.sim_gif;
+    setupChart(res.data.density_data)
+
 
     preview!.src = b64_gif;
     preview!.style.opacity = "1";
@@ -44,30 +49,9 @@ function postSimRequest(simRequest: SimRequestDto) {
 
   }).catch(err => {
     if (imgLoading) imgLoading.style.opacity = "0";
-    console.log("fetch failed! 😭: " + err.message);
+    console.log("fetch failed: " + err.message);
   });
   console.log(result)
-}
-
-
-function getSimulation() {
-  console.log("fetching simulation");
-
-  if (imgLoading) imgLoading.style.opacity = "1";
-  axios("http://127.0.0.1:8000/image", {
-    method: 'get'
-  }).then(res => {
-    let b64_gif: string = "data:image/gif;base64,";
-    b64_gif += res.data.image_gif;
-
-    if (preview) preview.src = b64_gif;
-    if (preview) preview.style.opacity = "1";
-    if (imgLoading) imgLoading.style.opacity = "0";
-
-  }).catch(err => {
-    if (imgLoading) imgLoading.style.opacity = "0";
-    console.log("fetch failed! 😭: " + err.message);
-  });
 }
 
 let testObj: SimRequestDto = {

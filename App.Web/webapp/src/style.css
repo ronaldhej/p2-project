@@ -41,6 +41,15 @@ body {
   width: fit-content;
 }
 
+#image-area {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  width: fit-content;
+}
+
 .navbar {
   margin-top: 2rem;
   margin-left: 2rem;
