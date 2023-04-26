@@ -118,34 +118,16 @@ class Simulator(arcade.Window):
         self.space.add(shape, body)
         self.static_lines.append(shape)
 
-        wall_verts_list:list[list[tuple[float, float]]] = [
-                [
-                    (4,128-32),
-                    (256-16,128),
-                    (256-14, SPACE_HEIGHT - 64),
-                    (4,SPACE_HEIGHT - 32)
-                ],[
-                    (SPACE_WIDTH - 4,128-32),
-                    (256+16,128),
-                    (256+14, SPACE_HEIGHT - 64),
-                    (SPACE_WIDTH - 4,SPACE_HEIGHT - 32)
-                ],[
-                    (256-32,72+8),
-                    (256-32,72-8),
-                    (256+32,72+40),
-                    (256+140,72+16),
-                    (256+128,72-8)
-                ]
-            ]
-        
-        for vs in wall_verts_list:
-            wall_body = pymunk.Body(body_type=pymunk.Body.STATIC)
-            wall_shape = pymunk.Poly(wall_body, vs)
-            wall_shape.friction = 10
-
-            self.space.add(wall_shape, wall_body)
-            self.wall_list.append(wall_shape)
-
+    def add_wall(self, wall_verts: tuple[int,int]):
+        '''add wall to wall list, with any number if integer points (more than 3)'''
+        if len(wall_verts) < 3:
+            return
+        wall_body = pymunk.Body(body_type=pymunk.Body.STATIC)
+        wall_shape = pymunk.Poly(wall_body, wall_verts)
+        wall_shape.friction = 10
+        self.space.add(wall_shape, wall_body)
+        self.wall_list.append(wall_shape)
+    
     def on_draw(self):
         pass
 
@@ -182,7 +164,24 @@ class Scenario:
 def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
+    window.add_wall([
+                    (4,128-32),
+                    (256-16,128),
+                    (256-14, SPACE_HEIGHT - 64),
+                    (4,SPACE_HEIGHT - 32)])
+    window.add_wall([
+                    (SPACE_WIDTH - 4,128-32),
+                    (256+16,128),
+                    (256+14, SPACE_HEIGHT - 64),
+                    (SPACE_WIDTH - 4,SPACE_HEIGHT - 32)])
+    window.add_wall([
+                    (256-32,72+8),
+                    (256-32,72-8),
+                    (256+32,72+40),
+                    (256+140,72+16),
+                    (256+128,72-8)])
     window.setup()
+    
     print("sim start")
     agent_num_list = []
     # arcade.run()
