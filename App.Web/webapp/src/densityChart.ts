@@ -7,9 +7,9 @@ import Chart from 'chart.js/auto'
 // borderColor: "#e44f22",
 // tension: 0.1,
 
-const data1 = [ ...Array(120).keys() ].map( i => Math.max(0,Math.round((i/120)*10 + (Math.random()*10-5)+5)));
+const data1 = [...Array(120).keys()].map(i => Math.max(0, Math.round((i / 120) * 10 + (Math.random() * 10 - 5) + 5)));
 
-const xAxis = [ ...Array(120).keys() ].map( i => i+1);
+const xAxis = [...Array(120).keys()].map(i => i + 1);
 
 let densityChart: Chart;
 const CLIP_DENSITY = 14
@@ -22,13 +22,13 @@ export default function setupChart() {
       labels: xAxis,
       datasets: [
         {
-          borderWidth:1,
+          borderWidth: 1,
           label: "greatest density",
           data: data1,
-          stepped:true,
-          borderColor:"#e44f22",
-          backgroundColor: ['#e44f2210','#f18b3710'],
-          fill:true,
+          stepped: true,
+          borderColor: "#e44f22",
+          backgroundColor: ['#e44f2210', '#f18b3710'],
+          fill: true,
           pointRadius: 0,
           segment: {
             borderColor: (ctx) => {
@@ -48,21 +48,23 @@ export default function setupChart() {
       ]
     },
     options: {
-    interaction: {
-      mode: 'nearest',
-      axis: 'x',
-      intersect: false,
-    },
-    scales: {
-      x: {
-        grid: {
-          color: '#2C323F'
-        }
+      interaction: {
+        mode: 'nearest',
+        axis: 'x',
+        intersect: false,
       },
-      y: {
-        grid: {
-          color: '#2C323F',
+      scales: {
+        x: {
+          grid: {
+            color: '#2C323F'
+          }
         },
+        y: {
+          grid: {
+            color: '#2C323F',
+          },
+        }
       }
     }
-  }})}
+  })
+}

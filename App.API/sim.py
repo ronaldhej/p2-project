@@ -146,7 +146,7 @@ class Simulator(arcade.Window):
 
             self.space.add(wall_shape, wall_body)
             self.wall_list.append(wall_shape)
-    
+
     def on_draw(self):
         pass
 
@@ -274,18 +274,3 @@ def sim_update(sim: Simulator):
     sim.animation.append(frame_image)
     density_data = DensityData(sim.total_steps, max(step_density_vals))
     sim.density_data.append(density_data)
-    
-def graph() -> io.BytesIO:
-    x1 = [1,2,3]
-    y1 = [2,4,1]
-    plt.plot(x1, y1)
-  
-    plt.xlabel('Time')
-    plt.ylabel('Max density')
-    plt.title('Max density over time')
-
-    image_buffer = io.BytesIO()
-
-    plt.savefig(image_buffer, format='png', bbox_inches='tight')
-
-    return image_buffer
