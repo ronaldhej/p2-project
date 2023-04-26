@@ -3,11 +3,15 @@ import axios, { AxiosHeaders } from 'axios'
 import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
 import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './densityChart'
+const SIM_SIZE = 512;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   ${navbar()}
   <div id="content">
-    <img id="img-preview" src="./placeholder.png">
+    <div>
+      <div class="progress-bar" id="progress-bar"></div>
+      <img id="img-preview" src="./placeholder.png">
+    </div>
     <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
@@ -20,6 +24,7 @@ setupChart();
 
 const elApp: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
+const progressBar: HTMLDivElement | null = document.getElementById("progress-bar") as HTMLDivElement;
 const imgLoading: HTMLImageElement | null = document.getElementById("loading") as HTMLImageElement;
 
 //simulation input
@@ -40,12 +45,13 @@ function postSimRequest(simRequest: SimRequestDto) {
   const result = axios.post("http://127.0.0.1:8000/simulate", simRequest).then(res => {
     let b64_gif: string = "data:image/gif;base64,";
     b64_gif += res.data.sim_gif;
-    setupChart(res.data.density_data)
+    setupChart()
 
 
     preview!.src = b64_gif;
     preview!.style.opacity = "1";
     imgLoading!.style.opacity = "0";
+
 
   }).catch(err => {
     if (imgLoading) imgLoading.style.opacity = "0";
@@ -72,6 +78,7 @@ getSimBtn.addEventListener('click', e => {
   e.preventDefault()
   clearGraph()
   updateGraphRange(parseInt(simRuntime.value)*30)
+  preview!.style.opacity = "0.2";
   
   let simRequest: SimRequestDto = {
     agent_num: parseInt(simAgentNum.value),
@@ -88,7 +95,7 @@ getSimBtn.addEventListener('click', e => {
   }
   
   
-  let ws = new WebSocket("ws://127.0.0.1:8000/ws");
+  let ws = new WebSocket("ws://localhost:8000/ws");
   ws.onopen = () => ws.send(JSON.stringify(simRequest))
   ws.onmessage = function(event) { 
     let data = JSON.parse(event.data)
@@ -100,21 +107,27 @@ getSimBtn.addEventListener('click', e => {
         preview!.src = b64_gif;
         preview!.style.opacity = "1";
         imgLoading!.style.opacity = "0";
+        progressBar.style.opacity = "0"
+        progressBar.style.width = "0px"
         break
 
       case 1:
-        console.log(data.agent_num_datapoint);
         updateGraphAddData(data.agent_num_datapoint);
+        let prog = data.progress/(parseInt(simRuntime.value)*30)
+        progressBar.style.opacity = "0.2"
+        progressBar.style.width = (prog*SIM_SIZE).toString() + 'px';
         
         break
 
       default:
         break
     }
-
-
-    
   };
+  ws.onclose = () => {
+    progressBar.style.opacity = "0"
+    progressBar.style.width = "0px"
+    console.log("connection closed");
+  }
 
 
   //postSimRequest(simRequest);

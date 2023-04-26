@@ -152,6 +152,17 @@ body {
   image-rendering: pixelated;
 }
 
+.progress-bar {
+  position: absolute;
+  border-radius: 8px;
+  width: 512px;
+  height: 512px;
+  opacity: 0.5;
+  background-color: var(--c-mid);
+
+  transition: 0.2s ease-out;
+}
+
 button {
   margin-top: 2rem;
   margin-bottom: 2rem;

@@ -81,11 +81,13 @@ export function updateGraphRange(range:number) {
 export function updateGraphAddData(data:number) {
   agent_num_data.push(data);
   densityChart.data.datasets[0].data = agent_num_data;
-  densityChart.update();
+  densityChart.update('none');
+  
 }
 
 export function clearGraph() {
   densityChart.data.labels = [];
   densityChart.data.datasets[0].data = [];
-  densityChart.update();
+  agent_num_data = [];
+  densityChart.update('none');
 }
