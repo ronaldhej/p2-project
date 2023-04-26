@@ -2,7 +2,7 @@ import './style.css'
 import axios, { AxiosHeaders } from 'axios'
 import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
-import setupChart from './densityChart'
+import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './densityChart'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   ${navbar()}
@@ -16,7 +16,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
 `
 //setupNavbar();
-//setupChart([]);
+setupChart();
 
 const elApp: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
@@ -69,6 +69,9 @@ let testObj: SimRequestDto = {
 }
 
 getSimBtn.addEventListener('click', e => {
+  e.preventDefault()
+  clearGraph()
+  updateGraphRange(parseInt(simRuntime.value)*30)
   
   let simRequest: SimRequestDto = {
     agent_num: parseInt(simAgentNum.value),
@@ -84,18 +87,32 @@ getSimBtn.addEventListener('click', e => {
     ]
   }
   
-  e.preventDefault()
   
   let ws = new WebSocket("ws://127.0.0.1:8000/ws");
-  ws.onopen = () => ws.send("hello")
-  ws.onmessage = function(event) {
+  ws.onopen = () => ws.send(JSON.stringify(simRequest))
+  ws.onmessage = function(event) { 
     let data = JSON.parse(event.data)
-    let b64_gif: string = "data:image/gif;base64,";
-    b64_gif += data.sim_gif;
-    setupChart(data.density_data)
-    preview!.src = b64_gif;
-    preview!.style.opacity = "1";
-    imgLoading!.style.opacity = "0";
+
+    switch (data.type) {
+      case 0:
+        let b64_gif: string = "data:image/gif;base64,";
+        b64_gif += data.sim_gif;
+        preview!.src = b64_gif;
+        preview!.style.opacity = "1";
+        imgLoading!.style.opacity = "0";
+        break
+
+      case 1:
+        console.log(data.agent_num_datapoint);
+        updateGraphAddData(data.agent_num_datapoint);
+        
+        break
+
+      default:
+        break
+    }
+
+
     
   };
 

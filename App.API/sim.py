@@ -13,6 +13,7 @@ from flowfield import FlowField, Cell
 import utility
 from time import perf_counter
 from colorsys import hsv_to_rgb
+from fastapi import WebSocket
 # import glcontext
 
 SPACE_WIDTH = 512
@@ -161,7 +162,7 @@ class Scenario:
         pass
 
 
-def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
+async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
     window.add_wall([
@@ -208,6 +209,7 @@ def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
+        await socket.send_json({"type":1,"agent_num_datapoint": len(window.person_list)})
     arcade.exit()
     arcade.close_window()
     print("sim end")

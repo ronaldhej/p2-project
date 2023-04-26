@@ -9,15 +9,16 @@ import Chart from 'chart.js/auto'
 
 const data1 = [...Array(120).keys()].map(i => Math.max(0, Math.round((i / 120) * 10 + (Math.random() * 10 - 5) + 5)));
 
+let agent_num_data:number[] = []
 
 let densityChart: Chart;
 const CLIP_DENSITY = 14
 
 densityChart: Chart;
 
-export default function setupChart(data: number[]) {
+export default function setupChart() {
 
-  const xAxis = [...Array(data.length).keys()].map(i => i + 1);
+  const xAxis:number[] = [];
   densityChart = new Chart("density-chart", {
     type: 'line',
     data: {
@@ -26,7 +27,7 @@ export default function setupChart(data: number[]) {
         {
           borderWidth: 1,
           label: "Amount of agents",
-          data: data,
+          data: [],
           stepped: false,
           borderColor: "#e44f22",
           backgroundColor: ['#e44f2210', '#f18b3710'],
@@ -71,6 +72,20 @@ export default function setupChart(data: number[]) {
   })
 }
 
-export function updateGraph() {
-  densityChart.data
+export function updateGraphRange(range:number) {
+  const xAxis = [...Array(range).keys()].map(i => i + 1);
+  densityChart.data.labels = xAxis;
+  densityChart.update();
+}
+
+export function updateGraphAddData(data:number) {
+  agent_num_data.push(data);
+  densityChart.data.datasets[0].data = agent_num_data;
+  densityChart.update();
+}
+
+export function clearGraph() {
+  densityChart.data.labels = [];
+  densityChart.data.datasets[0].data = [];
+  densityChart.update();
 }

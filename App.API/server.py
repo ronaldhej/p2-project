@@ -53,7 +53,7 @@ async def run_sim(request: SimRequestDto):
     try:
         # buf = io.BytesIO()
         # image.save(buf, "GIF")
-        image_buffer, agent_amount_data = sim.run_agent_sim(60, False, request.agent_num, request.runtime, 32)
+        image_buffer, agent_amount_data = await sim.run_agent_sim(None, 60, False, request.agent_num, request.runtime, 32)
         print(agent_amount_data)
 
         image_buffer.seek(0)  # important here!
@@ -70,12 +70,16 @@ async def run_socket_sim(socket: WebSocket):
     print("handling connection request")
     await socket.accept()
     print("connection established")
-    image_buffer, agent_amount_data = sim.run_agent_sim(60, False, 1, 4, 32)
+    data = await socket.receive_text()
+    print(data)
+    request = json.loads(data)
+    print(request)
+    image_buffer, agent_amount_data = await sim.run_agent_sim(socket, 60, False, request["agent_num"], request["runtime"], 32)
     image_buffer.seek(0)
     buffer_bytes = image_buffer.getvalue()
     buffer_base64 = base64.b64encode(buffer_bytes)
     try:
-        await socket.send_json(data={"sim_gif": buffer_base64.decode('utf-8'), "density_data": agent_amount_data})
+        await socket.send_json(data={"type": 0,"sim_gif": buffer_base64.decode('utf-8'), "density_data": agent_amount_data})
         await socket.close()
     except WebSocketDisconnect:
         print("disconnected")
