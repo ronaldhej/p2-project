@@ -71,7 +71,7 @@ class Simulator(arcade.Window):
         self.runtime = runtime
         #space
         self.space = pymunk.Space()
-        self.space.iterations = 35
+        self.space.iterations = 100
         self.space.gravity = (0.0, 0.0)
         #Object Lists
         self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
@@ -179,11 +179,12 @@ class Scenario:
         pass
 
 
-def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[float]]:
+def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
     window.setup()
     print("sim start")
+    agent_num_list = []
     # arcade.run()
     flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (6,30))
     flowfield.setup(window.wall_list)
@@ -205,6 +206,7 @@ def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.
         t_draw_stop = perf_counter()
         t_update_start = perf_counter()
         sim_update(window)
+        agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
     arcade.exit()
@@ -220,8 +222,7 @@ def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.
                              optimize=True,
                              duration=1000/30,
                              loop=0)
-    window.density_data = [round(random.random()*7.0) for _ in range(120)]
-    return buffer, window.density_data
+    return buffer, agent_num_list
 
 def draw_grid(res: int):
     for i in range(res):
@@ -296,5 +297,5 @@ def sim_update(sim: Simulator):
 
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
-    density_data = DensityData(sim.total_steps, max(step_density_vals))
-    sim.density_data.append(density_data)
+    #density_data = DensityData(sim.total_steps, max(step_density_vals))
+    #sim.density_data.append(density_data)

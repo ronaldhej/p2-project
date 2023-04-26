@@ -9,13 +9,15 @@ import Chart from 'chart.js/auto'
 
 const data1 = [...Array(120).keys()].map(i => Math.max(0, Math.round((i / 120) * 10 + (Math.random() * 10 - 5) + 5)));
 
-const xAxis = [...Array(120).keys()].map(i => i + 1);
 
 let densityChart: Chart;
 const CLIP_DENSITY = 14
 
-export default function setupChart() {
+densityChart: Chart;
 
+export default function setupChart(data: number[]) {
+
+  const xAxis = [...Array(data.length).keys()].map(i => i + 1);
   densityChart = new Chart("density-chart", {
     type: 'line',
     data: {
@@ -23,27 +25,27 @@ export default function setupChart() {
       datasets: [
         {
           borderWidth: 1,
-          label: "greatest density",
-          data: data1,
-          stepped: true,
+          label: "Amount of agents",
+          data: data,
+          stepped: false,
           borderColor: "#e44f22",
           backgroundColor: ['#e44f2210', '#f18b3710'],
           fill: true,
           pointRadius: 0,
-          segment: {
-            borderColor: (ctx) => {
-              let val = ctx.p0.parsed.y;
-              return val >= CLIP_DENSITY ? '#e44f22' : "#f18b37"
-            },
-            backgroundColor: (ctx) => {
-              let val = ctx.p0.parsed.y;
-              return val >= CLIP_DENSITY ? '#e44f22' : "#ffffff00"
-            },
-            borderWidth: (ctx) => {
-              let val = ctx.p0.parsed.y;
-              return val >= CLIP_DENSITY ? 4 : 2
-            },
-          }
+          // segment: {
+          //   borderColor: (ctx) => {
+          //     let val = ctx.p0.parsed.y;
+          //     return val >= CLIP_DENSITY ? '#e44f22' : "#f18b37"
+          //   },
+          //   backgroundColor: (ctx) => {
+          //     let val = ctx.p0.parsed.y;
+          //     return val >= CLIP_DENSITY ? '#e44f22' : "#ffffff00"
+          //   },
+          //   borderWidth: (ctx) => {
+          //     let val = ctx.p0.parsed.y;
+          //     return val >= CLIP_DENSITY ? 4 : 2
+          //   },
+          // }
         }
       ]
     },
@@ -67,4 +69,8 @@ export default function setupChart() {
       }
     }
   })
+}
+
+export function updateGraph() {
+  densityChart.data
 }
