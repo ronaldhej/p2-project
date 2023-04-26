@@ -156,7 +156,7 @@ class Simulator(arcade.Window):
             body.position = pos
             shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
             shape.friction = 0.3
-            person = Agent(shape, (231, 191, 14), 0)
+            person = Agent(shape, (231, 191, 14), field_id)
             person.direction = random.randrange(0,2) * math.pi
             self.space.add(body, shape)
             self.person_list.append(person)
@@ -213,7 +213,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
-    #sim.flowfield.draw()
+    #sim.field_list[1].draw()
 
     for person in sim.person_list:
         person.draw()
@@ -238,7 +238,8 @@ def sim_update(sim: Simulator):
         #update flow field every second
         field_age += 1
         if field_age > FPS:
-            sim.flowfield.update()
+            for field in sim.field_list:
+                field.update()
             field_age = 0
         
         xpos = person.pymunk_shape.body.position.x
