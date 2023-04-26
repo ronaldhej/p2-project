@@ -9,7 +9,7 @@ import pyrender
 import io
 import math
 import random
-from flowfield import FlowField
+from flowfield import FlowField, Cell
 import utility
 from time import perf_counter
 from colorsys import hsv_to_rgb
@@ -52,7 +52,7 @@ class Agent(arcade.Sprite):
         #Personal Space Circle
         risk = self.nearby_agents / 7
         color = utility.heatmap_rgb(risk)
-        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, color)
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, (228, 79, 34))
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -142,24 +142,25 @@ class Simulator(arcade.Window):
         pass
 
     def setup(self):
-        for i in range(self.agent_num):
-            if i%2==0:    
-                field_id = 0
-                pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
-            else:
-                field_id = 1
-                pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, SPACE_HEIGHT - (random.random()-0.5)*16 - 32
-            
+        ...
 
-            inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
-            body = pymunk.Body(1,  inertia)
-            body.position = pos
-            shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
-            shape.friction = 0.3
-            person = Agent(shape, (231, 191, 14), field_id)
-            person.direction = random.randrange(0,2) * math.pi
-            self.space.add(body, shape)
-            self.person_list.append(person)
+    def add_agent(self, frame):
+        if frame%2==0:    
+            field_id = 0
+            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
+        else:
+            field_id = 1
+            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, SPACE_HEIGHT - (random.random()-0.5)*16 - 32
+        
+        inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
+        body = pymunk.Body(1,  inertia)
+        body.position = pos
+        shape = pymunk.Circle(body, AGENT_RADIUS, pymunk.Vec2d(0, 0))
+        shape.friction = 0.3
+        person = Agent(shape, (231, 191, 14), field_id)
+        person.direction = random.randrange(0,2) * math.pi
+        self.space.add(body, shape)
+        self.person_list.append(person)
 
 
 class Scenario:
@@ -181,7 +182,13 @@ def run_agent_sim(frames, save, agent_num, runtime, resolution) -> io.BytesIO:
     window.field_list.append(flowfield)
 
     f_end = runtime*FPS
+    t_add = 1
     for f in range(runtime*FPS):
+        t_add -= 1
+        if t_add <= 0:
+            window.add_agent(f)
+            window.add_agent(f+1)
+            t_add = 1
         t_draw_start = perf_counter()
         sim_draw(window)
         t_draw_stop = perf_counter()
@@ -233,28 +240,34 @@ def sim_update(sim: Simulator):
     """update step of simulation"""
     sim.space.step(1/FPS)
     field_age = 0
+    #update flow field every second
+    field_age += 1
+    if field_age > FPS:
+        for field in sim.field_list:
+            field.update()
+        field_age = 0
     for person in sim.person_list:
-
-        #update flow field every second
-        field_age += 1
-        if field_age > FPS:
-            for field in sim.field_list:
-                field.update()
-            field_age = 0
         
         xpos = person.pymunk_shape.body.position.x
         ypos = person.pymunk_shape.body.position.y
         person.center_x = xpos
         person.center_y = ypos
+        dead = False
         #person.angle = math.degrees(person.pymunk_shape.body.angle)
         if xpos > 0 and xpos < SPACE_WIDTH and ypos > 0 and ypos < SPACE_HEIGHT:
             field = sim.field_list[person.field_id]
-            person.target_direction = field.get_cell(xpos, ypos).direction
+            cell:Cell = field.get_cell(xpos, ypos)
+            person.target_direction = cell.direction
+            if cell.cost < 4:
+                dead = True
+                sim.space.remove(person.pymunk_shape, person.pymunk_shape.body)
+                sim.person_list.remove(person)
         else:
             pass #TODO set direction to center of space
-
-        person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
-        person.nearby_agents = len(person_near_list)
+        if dead:
+            continue
+        #person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
+        person.nearby_agents = 0#len(person_near_list)
         person.center_x = xpos
         person.center_y = ypos
         person.angle = math.degrees(person.pymunk_shape.body.angle)
