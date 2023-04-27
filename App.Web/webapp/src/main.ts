@@ -2,7 +2,7 @@ import './style.css'
 import axios, { AxiosHeaders } from 'axios'
 import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
-import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './densityChart'
+import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './simCharts'
 const SIM_SIZE = 512;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
@@ -16,6 +16,8 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
     <canvas id="density-chart"></canvas>
+    <canvas id="population-chart"></canvas>
+    <canvas id="runtime-chart"></canvas>
   </div>
 `
 //setupNavbar();
@@ -106,7 +108,7 @@ getSimBtn.addEventListener('click', e => {
         break
 
       case 1:
-        updateGraphAddData(data.agent_num_datapoint);
+        updateGraphAddData(data);
         let prog = data.progress/(parseInt(simRuntime.value)*30)
         progressBar.style.opacity = "0.2"
         progressBar.style.width = (prog*SIM_SIZE).toString() + 'px';

@@ -205,7 +205,13 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
-        await socket.send_json({"type":1,"agent_num_datapoint": len(window.person_list), "progress": f, "update": (t_update_stop - t_update_start), "draw": (t_draw_stop - t_draw_start)})
+        await socket.send_json({
+            "type":1,"population": len(window.person_list),
+            "density": 0,
+            "progress": f,
+            "update": (t_update_stop - t_update_start),
+            "draw": (t_draw_stop - t_draw_start)
+            })
     arcade.exit()
     arcade.close_window()
     print("sim end")
