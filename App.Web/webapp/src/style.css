@@ -155,9 +155,9 @@ body {
 .progress-bar {
   position: absolute;
   border-radius: 8px;
-  width: 512px;
+  width: 0px;
   height: 512px;
-  opacity: 0.5;
+  opacity: 0.0;
   background-color: var(--c-mid);
 
   transition: 0.2s ease-out;
