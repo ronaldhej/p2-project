@@ -26,7 +26,7 @@ export default function setupChart() {
       datasets: [
         {
           borderWidth: 1,
-          label: "Amount of agents",
+          label: "Population",
           data: [],
           stepped: false,
           borderColor: "#e44f22",
