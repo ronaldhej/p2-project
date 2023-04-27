@@ -1,11 +1,11 @@
-#import os
-#os.environ["ARCADE_HEADLESS"] = "true"
+import os
+os.environ["ARCADE_HEADLESS"] = "true"
+import pyrender
 
 import sys
 from PIL import Image, ImageDraw
 import arcade
 import pymunk
-import pyrender
 import io
 import math
 import random
@@ -58,7 +58,7 @@ class Agent(arcade.Sprite):
         #Personal Space Circle
         risk = self.nearby_agents / 7
         color = utility.heatmap_rgb(risk)
-        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, (228, 79, 34))
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, color) #(228, 79, 34))
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -205,7 +205,7 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
-        await socket.send_json({"type":1,"agent_num_datapoint": len(window.person_list), "progress": f})
+        await socket.send_json({"type":1,"agent_num_datapoint": len(window.person_list), "progress": f, "update": (t_update_stop - t_update_start), "draw": (t_draw_stop - t_draw_start)})
     arcade.exit()
     arcade.close_window()
     print("sim end")
@@ -279,8 +279,8 @@ def sim_update(sim: Simulator):
 
         if dead:
             continue
-        #person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
-        person.nearby_agents = 0#len(person_near_list)
+        person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
+        person.nearby_agents = len(person_near_list)
         person.center_x = xpos
         person.center_y = ypos
         person.angle = math.degrees(person.pymunk_shape.body.angle)

@@ -9,7 +9,7 @@ import Chart from 'chart.js/auto'
 
 const data1 = [...Array(120).keys()].map(i => Math.max(0, Math.round((i / 120) * 10 + (Math.random() * 10 - 5) + 5)));
 
-let agent_num_data:number[] = []
+let agent_num_data: number[] = []
 
 let densityChart: Chart;
 const CLIP_DENSITY = 14
@@ -18,7 +18,7 @@ densityChart: Chart;
 
 export default function setupChart() {
 
-  const xAxis:number[] = [];
+  const xAxis: number[] = [];
   densityChart = new Chart("density-chart", {
     type: 'line',
     data: {
@@ -72,17 +72,17 @@ export default function setupChart() {
   })
 }
 
-export function updateGraphRange(range:number) {
+export function updateGraphRange(range: number) {
   const xAxis = [...Array(range).keys()].map(i => i + 1);
   densityChart.data.labels = xAxis;
   densityChart.update();
 }
 
-export function updateGraphAddData(data:number) {
+export function updateGraphAddData(data: number) {
   agent_num_data.push(data);
   densityChart.data.datasets[0].data = agent_num_data;
   densityChart.update('none');
-  
+
 }
 
 export function clearGraph() {
