@@ -19,6 +19,9 @@ from fastapi import WebSocket, WebSocketDisconnect
 SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
 FPS = 30
+METER = 8
+WALKING_SPEED = METER*1.42*2
+AGENT_MAX = 1200
 
 AGENT_RADIUS = 2
 PERSONAL_SPACE = 3
@@ -44,7 +47,7 @@ class Agent(arcade.Sprite):
         self.pymunk_shape = pymunk_shape
         self.direction = 0
         self.target_direction = 0
-        self.magnitude = 20
+        self.magnitude = WALKING_SPEED
         self.nearby_agents = 0
         self.field_id = field_id
 
@@ -58,7 +61,7 @@ class Agent(arcade.Sprite):
         #Personal Space Circle
         risk = self.nearby_agents / 7
         color = utility.heatmap_rgb(risk)
-        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, color) #(228, 79, 34))
+        arcade.draw_circle_filled(self.center_x, self.center_y, self.radius, (228, 79, 34))
 
 class Simulator(arcade.Window):
     #Initializing states for the game
@@ -195,8 +198,12 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
 
     f_end = runtime*FPS
     for f in range(runtime*FPS):
-        for i in range(agent_num):
-            window.add_agent(f+i)
+        if len(window.person_list) < AGENT_MAX:
+            for i in range(agent_num):
+                if random.random() < 0.8:
+                    window.add_agent(0)
+                else:
+                    window.add_agent(1)
         t_draw_start = perf_counter()
         sim_draw(window)
         t_draw_stop = perf_counter()
@@ -291,8 +298,8 @@ def sim_update(sim: Simulator):
 
         if dead:
             continue
-        person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
-        person.nearby_agents = len(person_near_list)
+        #person_near_list = arcade.check_for_collision_with_list(person, sim.person_list)        
+        person.nearby_agents = 0#len(person_near_list)
         person.center_x = xpos
         person.center_y = ypos
         person.angle = math.degrees(person.pymunk_shape.body.angle)
