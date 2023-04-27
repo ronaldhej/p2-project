@@ -10,11 +10,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div id="content">
     <div>
       <div class="progress-bar" id="progress-bar"></div>
-      <img id="img-preview" src="./placeholder.png">
+      <img id="img-preview" src="">
     </div>
     <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
-    <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
+    <button id="form-sim-btn" type="submit">begin simulation 🚀</button>
   </div>
   <div id="results">
     <canvas id="density-chart"></canvas>
