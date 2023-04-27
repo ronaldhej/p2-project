@@ -12,7 +12,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <div class="progress-bar" id="progress-bar"></div>
       <img id="img-preview" src="">
     </div>
-    <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
+    <input type="number" id="simAgentNum" name="simAgentNum" placeholder="new agents per frame">
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">begin simulation 🚀</button>
   </div>
@@ -97,9 +97,9 @@ getSimBtn.addEventListener('click', e => {
   
   
   let ws = new WebSocket("ws://localhost:8000/ws");
-  ws.onopen = () => ws.send(JSON.stringify(simRequest))
+  ws.onopen = () => ws.send(JSON.stringify(simRequest));
   ws.onmessage = function(event) { 
-    let data = JSON.parse(event.data)
+    let data = JSON.parse(event.data);
 
     switch (data.type) {
       case 0:
@@ -107,16 +107,15 @@ getSimBtn.addEventListener('click', e => {
         b64_gif += data.sim_gif;
         preview!.src = b64_gif;
         preview!.style.opacity = "1";
-        progressBar.style.opacity = "0"
-        progressBar.style.width = "0px"
+        progressBar.style.opacity = "0";
+        progressBar.style.width = "0px";
         break
 
       case 1:
         updateGraphAddData(data);
-        let prog = data.progress/(parseInt(simRuntime.value)*30)
-        progressBar.style.opacity = "0.2"
+        let prog = data.progress/(parseInt(simRuntime.value)*30);
+        progressBar.style.opacity = "0.2";
         progressBar.style.width = (prog*SIM_SIZE).toString() + 'px';
-        
         break
 
       default:
@@ -124,8 +123,8 @@ getSimBtn.addEventListener('click', e => {
     }
   };
   ws.onclose = () => {
-    progressBar.style.opacity = "0"
-    progressBar.style.width = "0px"
+    progressBar.style.opacity = "0";
+    progressBar.style.width = "0px";
     console.log("connection closed");
   }
 
