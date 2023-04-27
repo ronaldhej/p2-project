@@ -29,6 +29,8 @@ body {
 #app {
   display: flex;
   flex-direction: row;
+  justify-content:center;
+  gap: 2rem;
 }
 
 #content {
@@ -36,9 +38,20 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: auto;
   margin-top: 2rem;
   width: fit-content;
+}
+
+#results {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin-top: 2rem;
+  width: 0px;
+
+  transition: 1s ease-out;
 }
 
 #image-area {
@@ -152,6 +165,16 @@ body {
   image-rendering: pixelated;
 }
 
+div:has(> #img-preview) {
+  border: 2px var(--c-semidark) solid;
+  border-radius: 8px;
+  padding: 0px;
+  margin: 0px;
+  height: 512px;
+  width: fit-content;
+  overflow-y: hidden;
+}
+
 .progress-bar {
   position: absolute;
   border-radius: 8px;
@@ -205,15 +228,6 @@ input:focus {
   outline: none;
 
   transition: 0.1s ease-out;
-}
-
-#loading {
-  width: 64px;
-  height: 64px;
-
-  opacity: 0;
-  animation: rotation 2s infinite cubic-bezier(0.4, 0.0, 0.3, 1);
-  transition: .4s ease-out;
 }
 
 @keyframes rotation {

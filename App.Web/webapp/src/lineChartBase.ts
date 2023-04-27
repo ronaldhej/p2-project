@@ -19,15 +19,10 @@ export default function baseChart(target: string, title:string, range:number):Ch
           ]
         },
         options: {
-          interaction: {
-            mode: 'nearest',
-            axis: 'x',
-            intersect: false,
-          },
           scales: {
             x: {
               grid: {
-                color: '#2C323F'
+                color: '#2C323F',
               }
             },
             y: {

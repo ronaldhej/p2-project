@@ -15,6 +15,8 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
     <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
+  </div>
+  <div id="results">
     <canvas id="density-chart"></canvas>
     <canvas id="population-chart"></canvas>
     <canvas id="runtime-chart"></canvas>
@@ -26,6 +28,7 @@ setupChart();
 const elApp: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
 const progressBar: HTMLDivElement | null = document.getElementById("progress-bar") as HTMLDivElement;
+const results: HTMLDivElement | null = document.getElementById("results") as HTMLDivElement;
 
 //simulation input
 const simAgentNum: HTMLInputElement | null = document.getElementById("simAgentNum") as HTMLInputElement;
@@ -76,6 +79,7 @@ getSimBtn.addEventListener('click', e => {
   clearGraph()
   updateGraphRange(parseInt(simRuntime.value)*30)
   preview!.style.opacity = "0.2";
+  results.style.width = 512 + 'px';
   
   let simRequest: SimRequestDto = {
     agent_num: parseInt(simAgentNum.value),

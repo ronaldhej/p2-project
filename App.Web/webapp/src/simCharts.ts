@@ -12,9 +12,15 @@ let simData:any[] = []
 
 const CLIP_DENSITY = 14
 
+Chart.defaults.color = "#5C6B80";
+Chart.defaults.interaction.mode = 'nearest';
+Chart.defaults.interaction.axis = 'x';
+Chart.defaults.interaction.intersect = false;
+
 let densityChart: Chart;
 let runtimeChart: Chart;
 let populationChart: Chart;
+
 
 export default function setupChart() {
    densityChart = baseChart("density-chart", "density", 0);
@@ -47,6 +53,36 @@ export function updateGraphRange(range: number) {
   densityChart.data.labels = xAxisFrames;
   populationChart.data.labels = xAxisFrames;
   runtimeChart.data.labels = xAxisFrames;
+
+  densityChart.options.scales = {
+    y: {
+      title: {
+        display: true,
+        text: "agents / m²"
+      }
+    }
+  }
+  populationChart.options = {
+    scales: {
+        y: {
+            suggestedMin: 0,
+            suggestedMax: 500,
+            title: {
+              display: true,
+              text: "agents"
+            }
+        }
+    }
+  }
+  runtimeChart.options.scales = {
+    y: {
+      title: {
+        display: true,
+        text: "milliseconds"
+      }
+    }
+  }
+
   densityChart.update();
   populationChart.update();
   runtimeChart.update();
@@ -75,7 +111,7 @@ export function clearGraph() {
   runtimeChart.data.datasets[0].data = [];
   runtimeChart.data.datasets[1].data = [];
   simData = [];
-  densityChart.update('none');
-  populationChart.update('none');
-  runtimeChart.update('none');
+  densityChart.update();
+  populationChart.update();
+  runtimeChart.update();
 }
