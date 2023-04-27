@@ -13,7 +13,7 @@ from flowfield import FlowField, Cell
 import utility
 from time import perf_counter
 from colorsys import hsv_to_rgb
-from fastapi import WebSocket
+from fastapi import WebSocket, WebSocketDisconnect
 # import glcontext
 
 SPACE_WIDTH = 512
@@ -205,13 +205,19 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
-        await socket.send_json({
-            "type":1,"population": len(window.person_list),
-            "density": 0,
-            "progress": f,
-            "update": (t_update_stop - t_update_start),
-            "draw": (t_draw_stop - t_draw_start)
-            })
+        try:
+            await socket.send_json({
+                "type":1,"population": len(window.person_list),
+                "density": 0,
+                "progress": f,
+                "update": (t_update_stop - t_update_start),
+                "draw": (t_draw_stop - t_draw_start)
+                })
+        except Exception:
+                print("exiting early")
+                arcade.exit()
+                arcade.close_window()
+                return None, []
     arcade.exit()
     arcade.close_window()
     print("sim end")
