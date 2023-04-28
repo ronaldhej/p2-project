@@ -14,6 +14,7 @@ import utility
 from time import perf_counter
 from colorsys import hsv_to_rgb
 from fastapi import WebSocket, WebSocketDisconnect
+import base64
 # import glcontext
 
 SPACE_WIDTH = 512
@@ -208,13 +209,19 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
         sim_draw(window)
         t_draw_stop = perf_counter()
         t_update_start = perf_counter()
-        sim_update(window)
+        frame_image, density = sim_update(window)
+        # buffer = frame_image.sa
+        # buffer.seek(0)
+        # buffer_bytes = buffer.getvalue()
+        # buffer_base64 = base64.b64encode(buffer_bytes)
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
         try:
             await socket.send_json({
                 "type":1,"population": len(window.person_list),
+                "frameImage": "buffer_base64",
+                "densityField": density,
                 "density": 0,
                 "progress": f,
                 "update": (t_update_stop - t_update_start),
@@ -265,11 +272,10 @@ def sim_draw(sim: Simulator):
         pv2 = body.position + line.b.rotated(body.angle)
         arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
 
-def sim_update(sim: Simulator):
+def sim_update(sim: Simulator) -> Image:
     """update step of simulation"""
     sim.space.step(1/FPS)
     sim.total_steps += 1
-    step_density_vals = []
     field_age = 0
     #update flow field every second
     field_age += 1
@@ -289,6 +295,7 @@ def sim_update(sim: Simulator):
             field = sim.field_list[person.field_id]
             cell:Cell = field.get_cell(xpos, ypos)
             person.target_direction = cell.direction
+            cell.density += 1
             if cell.cost < 4:
                 dead = True
                 sim.space.remove(person.pymunk_shape, person.pymunk_shape.body)
@@ -310,8 +317,11 @@ def sim_update(sim: Simulator):
         person.direction = person.direction + (diff)*0.1
         person.update_vel()
 
-
+    density_field = field.get_density_field()
+    field.clear_density()
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
+    print(density_field)
+    return frame_image, density_field
     #density_data = DensityData(sim.total_steps, max(step_density_vals))
     #sim.density_data.append(density_data)
