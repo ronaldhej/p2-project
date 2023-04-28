@@ -1,11 +1,11 @@
-#import os
-#os.environ["ARCADE_HEADLESS"] = "true"
+import os
+os.environ["ARCADE_HEADLESS"] = "true"
+import pyrender
 
 import sys
 from PIL import Image, ImageDraw
 import arcade
 import pymunk
-import pyrender
 import io
 import math
 import random
@@ -13,11 +13,15 @@ from flowfield import FlowField, Cell
 import utility
 from time import perf_counter
 from colorsys import hsv_to_rgb
+from fastapi import WebSocket, WebSocketDisconnect
 # import glcontext
 
 SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
 FPS = 30
+METER = 8
+WALKING_SPEED = METER*1.42*2
+AGENT_MAX = 1200
 
 AGENT_RADIUS = 2
 PERSONAL_SPACE = 3
@@ -43,7 +47,7 @@ class Agent(arcade.Sprite):
         self.pymunk_shape = pymunk_shape
         self.direction = 0
         self.target_direction = 0
-        self.magnitude = 20
+        self.magnitude = WALKING_SPEED
         self.nearby_agents = 0
         self.field_id = field_id
 
@@ -161,7 +165,7 @@ class Scenario:
         pass
 
 
-def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
+async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
     window.add_wall([
@@ -193,13 +197,13 @@ def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.
     window.field_list.append(flowfield)
 
     f_end = runtime*FPS
-    t_add = 1
     for f in range(runtime*FPS):
-        t_add -= 1
-        if t_add <= 0:
-            window.add_agent(f)
-            window.add_agent(f+1)
-            t_add = 1
+        if len(window.person_list) < AGENT_MAX:
+            for i in range(agent_num):
+                if random.random() < 0.8:
+                    window.add_agent(0)
+                else:
+                    window.add_agent(1)
         t_draw_start = perf_counter()
         sim_draw(window)
         t_draw_stop = perf_counter()
@@ -208,6 +212,19 @@ def run_agent_sim(frames, save, agent_num, runtime:int, resolution) -> tuple[io.
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
         print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
+        try:
+            await socket.send_json({
+                "type":1,"population": len(window.person_list),
+                "density": 0,
+                "progress": f,
+                "update": (t_update_stop - t_update_start),
+                "draw": (t_draw_stop - t_draw_start)
+                })
+        except Exception:
+                print("exiting early")
+                arcade.exit()
+                arcade.close_window()
+                return None, []
     arcade.exit()
     arcade.close_window()
     print("sim end")

@@ -2,25 +2,33 @@ import './style.css'
 import axios, { AxiosHeaders } from 'axios'
 import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
-import setupChart from './densityChart'
+import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './simCharts'
+const SIM_SIZE = 512;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   ${navbar()}
   <div id="content">
-    <img id="img-preview" src="./placeholder.png">
-    <input type="number" id="simAgentNum" name="simAgentNum" placeholder="number of agents">
+    <div>
+      <div class="progress-bar" id="progress-bar"></div>
+      <img id="img-preview" src="">
+    </div>
+    <input type="number" id="simAgentNum" name="simAgentNum" placeholder="new agents per frame">
     <input type="number" id="simRuntime" name="simRuntime" placeholder="runtime in seconds">
-    <button id="form-sim-btn" type="submit">submit simulation 🚀</button>
-    <img src="https://play-lh.googleusercontent.com/3Yh-SDp6KUf0vaZrsy4zSf_Gk8e4AAV15aMdHB7pZKZ96vYKWpyh1CiVZLdER5OLabSw" id="loading">
+    <button id="form-sim-btn" type="submit">begin simulation 🚀</button>
+  </div>
+  <div id="results">
     <canvas id="density-chart"></canvas>
+    <canvas id="population-chart"></canvas>
+    <canvas id="runtime-chart"></canvas>
   </div>
 `
 //setupNavbar();
-//setupChart([]);
+setupChart();
 
 const elApp: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
-const imgLoading: HTMLImageElement | null = document.getElementById("loading") as HTMLImageElement;
+const progressBar: HTMLDivElement | null = document.getElementById("progress-bar") as HTMLDivElement;
+const results: HTMLDivElement | null = document.getElementById("results") as HTMLDivElement;
 
 //simulation input
 const simAgentNum: HTMLInputElement | null = document.getElementById("simAgentNum") as HTMLInputElement;
@@ -35,20 +43,18 @@ function testSim(simRequest: SimRequestDto) {
 }
 
 function postSimRequest(simRequest: SimRequestDto) {
-  if (imgLoading) imgLoading.style.opacity = "1";
 
   const result = axios.post("http://127.0.0.1:8000/simulate", simRequest).then(res => {
     let b64_gif: string = "data:image/gif;base64,";
     b64_gif += res.data.sim_gif;
-    setupChart(res.data.density_data)
+    setupChart()
 
 
     preview!.src = b64_gif;
     preview!.style.opacity = "1";
-    imgLoading!.style.opacity = "0";
+
 
   }).catch(err => {
-    if (imgLoading) imgLoading.style.opacity = "0";
     console.log("fetch failed: " + err.message);
   });
   console.log(result)
@@ -70,8 +76,11 @@ let testObj: SimRequestDto = {
 
 getSimBtn.addEventListener('click', e => {
   e.preventDefault()
-  //getSimulation();
-  //testSim(testObj);
+  clearGraph()
+  updateGraphRange(parseInt(simRuntime.value)*30)
+  preview!.style.opacity = "0.2";
+  results.style.width = 512 + 'px';
+  
   let simRequest: SimRequestDto = {
     agent_num: parseInt(simAgentNum.value),
     runtime: parseInt(simRuntime.value),
@@ -85,8 +94,40 @@ getSimBtn.addEventListener('click', e => {
       }
     ]
   }
+  
+  
+  let ws = new WebSocket("ws://localhost:8000/ws");
+  ws.onopen = () => ws.send(JSON.stringify(simRequest));
+  ws.onmessage = function(event) { 
+    let data = JSON.parse(event.data);
+
+    switch (data.type) {
+      case 0:
+        let b64_gif: string = "data:image/gif;base64,";
+        b64_gif += data.sim_gif;
+        preview!.src = b64_gif;
+        preview!.style.opacity = "1";
+        progressBar.style.opacity = "0";
+        progressBar.style.width = "0px";
+        break
+
+      case 1:
+        updateGraphAddData(data);
+        let prog = data.progress/(parseInt(simRuntime.value)*30);
+        progressBar.style.opacity = "0.2";
+        progressBar.style.width = (prog*SIM_SIZE).toString() + 'px';
+        break
+
+      default:
+        break
+    }
+  };
+  ws.onclose = () => {
+    progressBar.style.opacity = "0";
+    progressBar.style.width = "0px";
+    console.log("connection closed");
+  }
 
 
-
-  postSimRequest(simRequest);
+  //postSimRequest(simRequest);
 })
