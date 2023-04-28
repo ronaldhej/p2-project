@@ -216,7 +216,7 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
         # buffer_base64 = base64.b64encode(buffer_bytes)
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
-        print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
+        #print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
         try:
             await socket.send_json({
                 "type":1,"population": len(window.person_list),
@@ -257,6 +257,7 @@ def sim_draw(sim: Simulator):
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
     #sim.field_list[1].draw()
+    arcade.draw_circle_outline(8,8,4,(255,0,0))
 
     for person in sim.person_list:
         person.draw()
@@ -317,11 +318,12 @@ def sim_update(sim: Simulator) -> Image:
         person.direction = person.direction + (diff)*0.1
         person.update_vel()
 
-    density_field = field.get_density_field()
-    field.clear_density()
+    density_field = sim.field_list[0].get_density_field()
+    density_field = sim.field_list[1].get_density_field(density_field)
+    sim.field_list[0].clear_density()
+    sim.field_list[1].clear_density()
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
-    print(density_field)
     return frame_image, density_field
     #density_data = DensityData(sim.total_steps, max(step_density_vals))
     #sim.density_data.append(density_data)

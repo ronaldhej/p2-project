@@ -192,13 +192,18 @@ class FlowField:
                 #arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
             #arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
 
-    def get_density_field(self) -> list[list[int]]:
+    def get_density_field(self, add_to_field:list[list[int]]=None) -> list[list[int]]:
         """return a matrix, representing density of each cell in flowfield"""
         res: int = self.resolution
-        d_field = [ [0]*res for _ in range(res)]
+        if add_to_field is not None:
+            d_field = add_to_field
+        else:
+            d_field = [ [0]*res for _ in range(res)]
+        
         for x in range(res):
             for y in range(res):
-                d_field[x][y] = self.field[x][y].density
+                d_field[x][y] += self.field[x][y].density
+        
         return d_field
     
     def clear_density(self):

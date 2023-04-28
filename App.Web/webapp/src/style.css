@@ -32,6 +32,7 @@ body {
   justify-content:center;
   align-items: flex-start;
   gap: 2rem;
+  max-height: 100vh;
 }
 
 #content {
@@ -50,18 +51,19 @@ body {
   align-items: center;
 
   margin-top: 2rem;
+  margin-bottom: 2rem;
   width: 0px;
+  max-width: 40vw;
 
   transition: 1s ease-out;
 }
 
-#image-area {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
-  width: fit-content;
+#density-map {
+  background-color: var(--c-semidark);
+  width: 100%;
+  image-rendering: pixelated;
+  transform: scaleY(-1);
+
 }
 
 .navbar {

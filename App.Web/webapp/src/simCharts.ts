@@ -1,6 +1,7 @@
 import Chart from 'chart.js/auto'
 import baseChart from './lineChartBase';
 import { max } from 'd3';
+import { updateDensityMap } from './densityMap';
 
 // label: 'density',
 // data: data.map(row => row.count),
@@ -90,11 +91,13 @@ export function updateGraphRange(range: number) {
 }
 
 export function updateGraphAddData(data: any) {
+  updateDensityMap(data.densityField)
   simData.push(data);
+  
   //var maxRow = arr.map(function(row){ return Math.max.apply(Math, row); });
   //var max = Math.max.apply(null, maxRow);
   const maxRowDensity:number[] = data.densityField.map(function(row:number[]){ return Math.max.apply(Math, row); })
-  const maxDensity = Math.max.apply(null, maxRowDensity)
+  const maxDensity = Math.max.apply(null, maxRowDensity) * (8/(512/32))
   
   densityChart.data.datasets[0].data.push(maxDensity ?? 0);
   populationChart.data.datasets[0].data.push(data?.population ?? 0);
