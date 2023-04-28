@@ -23,6 +23,7 @@ FPS = 30
 METER = 8
 WALKING_SPEED = METER*1.42*2
 AGENT_MAX = 1200
+KILL_RADIUS = 4
 
 AGENT_RADIUS = 2
 PERSONAL_SPACE = 3
@@ -217,7 +218,7 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
         # buffer_base64 = base64.b64encode(buffer_bytes)
         agent_num_list.append(len(window.person_list))
         t_update_stop = perf_counter()
-        #print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
+        print(f'EXECUTION TIME [\tdraw: {(t_draw_stop - t_draw_start) * 1000:.2f}ms\t| update: {(t_update_stop - t_update_start) * 1000:.2f}ms \t] frame: {f+1}/{f_end}')
         try:
             await socket.send_json({
                 "type":1,"population": len(window.person_list),
@@ -257,7 +258,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
-    sim.field_list[0].draw()
+    #sim.field_list[0].draw()
 
     for person in sim.person_list:
         person.draw()
@@ -280,7 +281,7 @@ def sim_update(sim: Simulator) -> Image:
     sim.total_steps += 1
     #update flow field every second
     sim.field_age += 1
-    if sim.field_age >= FPS:
+    if sim.field_age >= 4:
         for field in sim.field_list:
             field.update()
         sim.field_age = 0
@@ -297,16 +298,21 @@ def sim_update(sim: Simulator) -> Image:
         dead = False
         #person.angle = math.degrees(person.pymunk_shape.body.angle)
         if xpos > 0 and xpos < SPACE_WIDTH and ypos > 0 and ypos < SPACE_HEIGHT:
-            field = sim.field_list[person.field_id]
-            cell:Cell = field.get_cell(xpos, ypos)
+            cell:Cell = None
+            for i, field in enumerate(sim.field_list):
+                c:Cell = field.get_cell(xpos, ypos)
+                c.density += 1
+                if i == person.field_id:
+                    cell = c
+
             person.target_direction = cell.direction
-            cell.density += 1
-            if cell.cost < 4:
+
+            if cell.cost < KILL_RADIUS:
                 dead = True
                 sim.space.remove(person.pymunk_shape, person.pymunk_shape.body)
                 sim.person_list.remove(person)
-        else:
-            pass #TODO set direction to center of space
+            else:
+                pass #TODO set direction to center of space
 
         if dead:
             continue
@@ -323,7 +329,6 @@ def sim_update(sim: Simulator) -> Image:
         person.update_vel()
 
     density_field = sim.field_list[0].get_density_field()
-    density_field = sim.field_list[1].get_density_field(density_field)
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
     return frame_image, density_field

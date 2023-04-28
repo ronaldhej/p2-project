@@ -61,8 +61,9 @@ body {
 #density-map {
   background-color: var(--c-semidark);
   width: 100%;
+  margin-left: 1rem;
   image-rendering: pixelated;
-  transform: scaleY(-1);
+  transform: scaleY(-1) ;
 
   border: 2px var(--c-semidark) solid;
   border-radius: 8px;

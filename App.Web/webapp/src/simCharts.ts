@@ -1,18 +1,8 @@
 import Chart from 'chart.js/auto'
 import baseChart from './lineChartBase';
-import { max } from 'd3';
 import { updateDensityMap } from './densityMap';
 
-// label: 'density',
-// data: data.map(row => row.count),
-// fill: true,
-// backgroundColor: "#e44f2210",
-// borderColor: "#e44f22",
-// tension: 0.1,
-
 let simData:any[] = []
-
-const CLIP_DENSITY = 14
 
 Chart.defaults.color = "#5C6B80";
 Chart.defaults.interaction.mode = 'nearest';
