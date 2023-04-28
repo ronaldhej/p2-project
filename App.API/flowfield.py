@@ -20,7 +20,7 @@ class Cell:
     def __init__(self, x:int, y:int) -> None:
         self.direction = 0
         self.weight:int = 1
-        self.density = 0
+        self.density:int = 0
         self.cost:int = 0
         self.x:int = x
         self.y:int = y
@@ -138,8 +138,9 @@ class FlowField:
                 if cell not in open_list and cell.cost == MAX_COST:
                     open_list.append(cell)
 
-                new_cost:int = current_cell.cost + cell.weight
-                if new_cost < cell.cost: cell.cost = new_cost
+                new_cost:int = current_cell.cost + (cell.weight*(cell.density+1))
+                if new_cost < cell.cost:
+                    cell.cost = new_cost
 
 
         for i in range(self.resolution):
@@ -203,7 +204,7 @@ class FlowField:
         for x in range(res):
             for y in range(res):
                 d_field[x][y] += self.field[x][y].density
-        
+
         return d_field
     
     def clear_density(self):

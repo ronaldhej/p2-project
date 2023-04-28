@@ -90,6 +90,7 @@ class Simulator(arcade.Window):
         self.total_steps = 0
         self.animation = []
         self.field_list:list[FlowField] = []
+        self.field_age = 0
         self.space.collision_slop = 0
 
         #enable multithreading on other platforms than windows
@@ -256,7 +257,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
-    #sim.field_list[1].draw()
+    sim.field_list[0].draw()
 
     for person in sim.person_list:
         person.draw()
@@ -272,17 +273,21 @@ def sim_draw(sim: Simulator):
         pv2 = body.position + line.b.rotated(body.angle)
         arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (30, 33, 45), 5)
 
+
 def sim_update(sim: Simulator) -> Image:
     """update step of simulation"""
     sim.space.step(1/FPS)
     sim.total_steps += 1
-    field_age = 0
     #update flow field every second
-    field_age += 1
-    if field_age > FPS:
+    sim.field_age += 1
+    if sim.field_age >= FPS:
         for field in sim.field_list:
             field.update()
-        field_age = 0
+        sim.field_age = 0
+
+    sim.field_list[0].clear_density()
+    sim.field_list[1].clear_density()
+
     for person in sim.person_list:
         
         xpos = person.pymunk_shape.body.position.x
@@ -319,8 +324,6 @@ def sim_update(sim: Simulator) -> Image:
 
     density_field = sim.field_list[0].get_density_field()
     density_field = sim.field_list[1].get_density_field(density_field)
-    sim.field_list[0].clear_density()
-    sim.field_list[1].clear_density()
     frame_image = arcade.get_image(0, 0, *sim.get_size())
     sim.animation.append(frame_image)
     return frame_image, density_field
