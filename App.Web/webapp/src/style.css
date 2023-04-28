@@ -31,7 +31,7 @@ body {
   flex-direction: row;
   justify-content:center;
   align-items: flex-start;
-  gap: 2rem;
+  gap: 4rem;
   max-height: 100vh;
 }
 
@@ -53,7 +53,7 @@ body {
   margin-top: 2rem;
   margin-bottom: 2rem;
   width: 0px;
-  max-width: 40vw;
+  max-width: 512px;
 
   transition: 1s ease-out;
 }
@@ -64,6 +64,8 @@ body {
   image-rendering: pixelated;
   transform: scaleY(-1);
 
+  border: 2px var(--c-semidark) solid;
+  border-radius: 8px;
 }
 
 .navbar {

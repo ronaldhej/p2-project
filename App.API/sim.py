@@ -70,7 +70,7 @@ class Simulator(arcade.Window):
         super().__init__(SPACE_WIDTH, SPACE_HEIGHT)
         self.space_width = SPACE_WIDTH
         self.space_height = SPACE_HEIGHT
-        arcade.set_background_color((25,25,25))
+        arcade.set_background_color((30, 33, 45))
         #request args
         self.agent_num = agent_num
         self.runtime = runtime
@@ -257,7 +257,6 @@ def sim_draw(sim: Simulator):
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
     #sim.field_list[1].draw()
-    arcade.draw_circle_outline(8,8,4,(255,0,0))
 
     for person in sim.person_list:
         person.draw()
@@ -271,7 +270,7 @@ def sim_draw(sim: Simulator):
         body = line.body
         pv1 = body.position + line.a.rotated(body.angle)
         pv2 = body.position + line.b.rotated(body.angle)
-        arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (25,25,25), 5)
+        arcade.draw_line(pv1.x, pv1.y, pv2.x, pv2.y, (30, 33, 45), 5)
 
 def sim_update(sim: Simulator) -> Image:
     """update step of simulation"""
