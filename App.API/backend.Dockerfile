@@ -16,6 +16,9 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY . .
 
+# Expose port 8000 for incoming traffic
+EXPOSE 8000
+
 # Start Xvfb and server
 CMD ["bash", "-c", "Xvfb $DISPLAY -screen 0 1024x768x24 > /dev/null 2>&1 & \
                      sleep 1 && \
