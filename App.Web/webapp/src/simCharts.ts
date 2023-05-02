@@ -1,16 +1,8 @@
 import Chart from 'chart.js/auto'
 import baseChart from './lineChartBase';
-
-// label: 'density',
-// data: data.map(row => row.count),
-// fill: true,
-// backgroundColor: "#e44f2210",
-// borderColor: "#e44f22",
-// tension: 0.1,
+import { updateDensityMap } from './densityMap';
 
 let simData:any[] = []
-
-const CLIP_DENSITY = 14
 
 Chart.defaults.color = "#5C6B80";
 Chart.defaults.interaction.mode = 'nearest';
@@ -89,8 +81,15 @@ export function updateGraphRange(range: number) {
 }
 
 export function updateGraphAddData(data: any) {
+  updateDensityMap(data.densityField)
   simData.push(data);
-  densityChart.data.datasets[0].data.push(data?.density ?? 0);
+  
+  //var maxRow = arr.map(function(row){ return Math.max.apply(Math, row); });
+  //var max = Math.max.apply(null, maxRow);
+  const maxRowDensity:number[] = data.densityField.map(function(row:number[]){ return Math.max.apply(Math, row); })
+  const maxDensity = Math.max.apply(null, maxRowDensity) * (8/(512/32))
+  
+  densityChart.data.datasets[0].data.push(maxDensity ?? 0);
   populationChart.data.datasets[0].data.push(data?.population ?? 0);
 
   runtimeChart.data.datasets[0].data.push(data?.update * 1000 ?? 0);

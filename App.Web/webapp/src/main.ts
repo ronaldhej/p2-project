@@ -1,8 +1,8 @@
 import './style.css'
-import axios, { AxiosHeaders } from 'axios'
 import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
 import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './simCharts'
+import { setupDensityMap } from './densityMap'
 const SIM_SIZE = 512;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
@@ -17,6 +17,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <button id="form-sim-btn" type="submit">begin simulation 🚀</button>
   </div>
   <div id="results">
+    <canvas id="density-map"></canvas>
     <canvas id="density-chart"></canvas>
     <canvas id="population-chart"></canvas>
     <canvas id="runtime-chart"></canvas>
@@ -24,8 +25,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 `
 //setupNavbar();
 setupChart();
+setupDensityMap("density-map");
 
-const elApp: HTMLElement | null = document.getElementById("app");
+const app: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
 const progressBar: HTMLDivElement | null = document.getElementById("progress-bar") as HTMLDivElement;
 const results: HTMLDivElement | null = document.getElementById("results") as HTMLDivElement;
@@ -35,51 +37,12 @@ const simAgentNum: HTMLInputElement | null = document.getElementById("simAgentNu
 const simRuntime: HTMLInputElement | null = document.getElementById("simRuntime") as HTMLInputElement;
 const getSimBtn: HTMLButtonElement | null = document.getElementById("form-sim-btn") as HTMLButtonElement;
 
-
-function testSim(simRequest: SimRequestDto) {
-  axios("http://127.0.0.1:8000/simulate", { method: 'post', data: JSON.stringify(simRequest) }).then(res => {
-    console.log(res.data);
-  })
-}
-
-function postSimRequest(simRequest: SimRequestDto) {
-
-  const result = axios.post("http://127.0.0.1:8000/simulate", simRequest).then(res => {
-    let b64_gif: string = "data:image/gif;base64,";
-    b64_gif += res.data.sim_gif;
-    setupChart()
-
-
-    preview!.src = b64_gif;
-    preview!.style.opacity = "1";
-
-
-  }).catch(err => {
-    console.log("fetch failed: " + err.message);
-  });
-  console.log(result)
-}
-
-let testObj: SimRequestDto = {
-  "agent_num": 0,
-  "runtime": 10,
-  "map": [
-    {
-      "center_x": 0,
-      "center_y": 0,
-      "width": 0,
-      "height": 0,
-      "color": "White"
-    }
-  ]
-}
-
 getSimBtn.addEventListener('click', e => {
   e.preventDefault()
   clearGraph()
   updateGraphRange(parseInt(simRuntime.value)*30)
   preview!.style.opacity = "0.2";
-  results.style.width = 512 + 'px';
+  results.style.width = '100%';
   
   let simRequest: SimRequestDto = {
     agent_num: parseInt(simAgentNum.value),
@@ -127,7 +90,4 @@ getSimBtn.addEventListener('click', e => {
     progressBar.style.width = "0px";
     console.log("connection closed");
   }
-
-
-  //postSimRequest(simRequest);
 })

@@ -20,6 +20,7 @@ class Cell:
     def __init__(self, x:int, y:int) -> None:
         self.direction = 0
         self.weight:int = 1
+        self.density:int = 0
         self.cost:int = 0
         self.x:int = x
         self.y:int = y
@@ -137,8 +138,9 @@ class FlowField:
                 if cell not in open_list and cell.cost == MAX_COST:
                     open_list.append(cell)
 
-                new_cost:int = current_cell.cost + cell.weight
-                if new_cost < cell.cost: cell.cost = new_cost
+                new_cost:int = current_cell.cost + (cell.weight*(cell.density+1))
+                if new_cost < cell.cost:
+                    cell.cost = new_cost
 
 
         for i in range(self.resolution):
@@ -190,3 +192,21 @@ class FlowField:
                                  color,1)
                 #arcade.draw_text(str(cell.cost),center_x, center_y, color, 10)
             #arcade.draw_line(x*self.cell_width,SPACE_HEIGHT,x*self.cell_width,0, (55,55,55))
+
+    def get_density_field(self) -> list[list[int]]:
+        """return a matrix, representing density of each cell in flowfield"""
+        res: int = self.resolution
+        d_field = [ [0]*res for _ in range(res)]
+        
+        for x in range(res):
+            for y in range(res):
+                d_field[x][y] += self.field[x][y].density
+
+        return d_field
+    
+    def clear_density(self):
+        """reset density of all cells in field"""
+        res: int = self.resolution
+        for x in range(res):
+            for y in range(res):
+                self.field[x][y].density = 0

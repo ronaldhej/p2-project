@@ -31,7 +31,8 @@ body {
   flex-direction: row;
   justify-content:center;
   align-items: flex-start;
-  gap: 2rem;
+  gap: 4rem;
+  max-height: 100vh;
 }
 
 #content {
@@ -50,18 +51,22 @@ body {
   align-items: center;
 
   margin-top: 2rem;
+  margin-bottom: 2rem;
   width: 0px;
+  max-width: 512px;
 
   transition: 1s ease-out;
 }
 
-#image-area {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
-  width: fit-content;
+#density-map {
+  background-color: var(--c-semidark);
+  width: 100%;
+  margin-left: 1rem;
+  image-rendering: pixelated;
+  transform: scaleY(-1) ;
+
+  border: 2px var(--c-semidark) solid;
+  border-radius: 8px;
 }
 
 .navbar {
