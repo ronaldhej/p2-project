@@ -18,6 +18,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
   <div id="results">
     <canvas id="density-map"></canvas>
+    <div id="density-map-select">
+      <span class="unselectable"></span>
+    </div>
     <canvas id="density-chart"></canvas>
     <canvas id="population-chart"></canvas>
     <canvas id="runtime-chart"></canvas>
@@ -26,7 +29,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 //setupNavbar();
 setupChart();
 setupDensityMap("density-map");
-let densityMapData: number[] = [];
 
 const app: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;

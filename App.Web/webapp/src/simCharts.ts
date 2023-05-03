@@ -68,6 +68,7 @@ export function updateGraphRange(range: number) {
 
   densityChart.options.scales = {
     y: {
+      suggestedMin: 0,
       title: {
         display: true,
         text: "agents / m²"

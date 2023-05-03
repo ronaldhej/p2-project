@@ -22,6 +22,15 @@
   --c-attention_light:#f18b37;
 }
 
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 body {
   margin: 0;
 }
@@ -63,11 +72,37 @@ body {
   width: 100%;
   margin-left: 1rem;
   image-rendering: pixelated;
-  transform: scaleY(-1) ;
+  transform: scaleY(-1);
 
   border: 2px var(--c-semidark) solid;
   border-radius: 8px;
 }
+
+#density-map-select {
+  pointer-events: none;
+  position: absolute;
+  top: 50vh;
+  left: 50vw;
+
+  outline: 1px dashed var(--c-light);
+  display: flex;
+  align-items: center;
+
+  opacity: 0;
+  transition: .2s ease-out;
+}
+
+#density-map-select span{
+  margin-left: 150%;
+  min-width: 12rem;
+  width: fit-content;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #5c6b804b;
+  color: var(--c-light);
+  overflow-x: hidden;
+}
+
 
 .navbar {
   margin-top: 2rem;
