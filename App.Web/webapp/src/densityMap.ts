@@ -1,11 +1,11 @@
-let canvas:HTMLCanvasElement;
-let ctx:CanvasRenderingContext2D | null;
+let canvas: HTMLCanvasElement;
+let ctx: CanvasRenderingContext2D | null;
 const RES = 32
 
-const colorLow:number[] = [30, 33, 45];
-const colorHigh:number[] = [255,255,255];
-const riskLow:number[] = [241, 139, 55];
-const riskHigh:number[] = [228, 79, 34];
+const colorLow: number[] = [30, 33, 45];
+const colorHigh: number[] = [255, 255, 255];
+const riskLow: number[] = [241, 139, 55];
+const riskHigh: number[] = [228, 79, 34];
 
 export function setupDensityMap(id: string) {
     canvas = document.getElementById(id) as HTMLCanvasElement ?? null;
@@ -15,7 +15,7 @@ export function setupDensityMap(id: string) {
 }
 
 export function updateDensityMap(densityField: number[][]) {
-    
+
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
     if (ctx == null) return
@@ -30,11 +30,11 @@ export function updateDensityMap(densityField: number[][]) {
             let y = yy;
 
             let density = densityField[x][y];
-            let sqMeterCount = density * (8/(512/32));
-            let densityValue = Math.min(sqMeterCount/7, 1);
+            let sqMeterCount = density * (8 / (512 / 32));
+            let densityValue = Math.min(sqMeterCount / 7, 1);
 
             if (sqMeterCount > 7) {
-                densityValue = Math.min((sqMeterCount-7)/5, 1);
+                densityValue = Math.min((sqMeterCount - 7) / 5, 1);
             }
 
             let r = 0;

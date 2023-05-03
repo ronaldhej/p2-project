@@ -14,11 +14,9 @@ let densityChart: Chart;
 let runtimeChart: Chart;
 let populationChart: Chart;
 
-export function debounce(func: Function, time = 100) {
-
+const debounce = (func: Function, time = 100) => {
   let timeoutId: ReturnType<typeof setTimeout>;
   return function (this: any, ...args: any[]) {
-    console.log("hello");
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func.apply(this, args), time);
   };
@@ -32,10 +30,8 @@ export default function setupChart() {
         label: function (ctx) {
           let frame = ctx.parsed.x;
           console.log(frame);
-          updateDensityMap(densityMapData[frame])
 
-          // const debounced = debounce(() => console.log("debounced" + ctx.parsed.x), 500);
-          // debounced();
+          debounce(() => { updateDensityMap(densityMapData[frame]) }, 50)()
 
         }
       }
