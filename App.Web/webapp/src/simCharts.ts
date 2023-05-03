@@ -30,7 +30,7 @@ export default function setupChart() {
       callbacks: {
         label: function (ctx) {
           let frame = ctx.parsed.x;
-          debounce(() => { updateDensityMap(densityMapData[frame]) }, 10)()
+          debounce(() => { updateDensityMap(densityMapData[frame]) }, 5)()
 
         }
       }
