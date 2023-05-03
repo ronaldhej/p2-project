@@ -167,6 +167,7 @@ body {
   border-radius: 8px;
   opacity: 0.2;
   width: 100%;
+  max-width: 512px;
   min-height: 512px;
 
   image-rendering: pixelated;

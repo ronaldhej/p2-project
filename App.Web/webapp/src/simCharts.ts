@@ -2,7 +2,8 @@ import Chart from 'chart.js/auto'
 import baseChart from './lineChartBase';
 import { updateDensityMap } from './densityMap';
 
-let simData:any[] = []
+let simData: any[] = []
+let densityMapData: number[][][] = [];
 
 Chart.defaults.color = "#5C6B80";
 Chart.defaults.interaction.mode = 'nearest';
@@ -13,13 +14,37 @@ let densityChart: Chart;
 let runtimeChart: Chart;
 let populationChart: Chart;
 
+export function debounce(func: Function, time = 100) {
+
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: any[]) {
+    console.log("hello");
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), time);
+  };
+}
 
 export default function setupChart() {
-   densityChart = baseChart("density-chart", "density", 0);
-   populationChart = baseChart("population-chart", "population", 0);
+  densityChart = baseChart("density-chart", "density", 0);
+  densityChart.options.plugins = {
+    tooltip: {
+      callbacks: {
+        label: function (ctx) {
+          let frame = ctx.parsed.x;
+          console.log(frame);
+          updateDensityMap(densityMapData[frame])
 
-   runtimeChart = baseChart("runtime-chart", "runtime", 0);
-   runtimeChart.data.datasets = [{
+          // const debounced = debounce(() => console.log("debounced" + ctx.parsed.x), 500);
+          // debounced();
+
+        }
+      }
+    }
+  }
+  populationChart = baseChart("population-chart", "population", 0);
+
+  runtimeChart = baseChart("runtime-chart", "runtime", 0);
+  runtimeChart.data.datasets = [{
     borderWidth: 1,
     label: "update",
     data: [],
@@ -28,7 +53,7 @@ export default function setupChart() {
     backgroundColor: '#e44f2210',
     fill: true,
     pointRadius: 0,
-  },{
+  }, {
     borderWidth: 1,
     label: "draw",
     data: [],
@@ -56,14 +81,14 @@ export function updateGraphRange(range: number) {
   }
   populationChart.options = {
     scales: {
-        y: {
-            suggestedMin: 0,
-            suggestedMax: 500,
-            title: {
-              display: true,
-              text: "agents"
-            }
+      y: {
+        suggestedMin: 0,
+        suggestedMax: 500,
+        title: {
+          display: true,
+          text: "agents"
         }
+      }
     }
   }
   runtimeChart.options.scales = {
@@ -81,14 +106,15 @@ export function updateGraphRange(range: number) {
 }
 
 export function updateGraphAddData(data: any) {
-  updateDensityMap(data.densityField)
+  densityMapData.push(data.densityField);
+  updateDensityMap(data.densityField);
   simData.push(data);
-  
+
   //var maxRow = arr.map(function(row){ return Math.max.apply(Math, row); });
   //var max = Math.max.apply(null, maxRow);
-  const maxRowDensity:number[] = data.densityField.map(function(row:number[]){ return Math.max.apply(Math, row); })
-  const maxDensity = Math.max.apply(null, maxRowDensity) * (8/(512/32))
-  
+  const maxRowDensity: number[] = data.densityField.map(function (row: number[]) { return Math.max.apply(Math, row); })
+  const maxDensity = Math.max.apply(null, maxRowDensity) * (8 / (512 / 32))
+
   densityChart.data.datasets[0].data.push(maxDensity ?? 0);
   populationChart.data.datasets[0].data.push(data?.population ?? 0);
 
