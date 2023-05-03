@@ -4,6 +4,7 @@ import { updateDensityMap } from './densityMap';
 
 let simData: any[] = []
 let densityMapData: number[][][] = [];
+let debounceIdSlot: ReturnType<typeof setTimeout>;
 
 Chart.defaults.color = "#5C6B80";
 Chart.defaults.interaction.mode = 'nearest';
@@ -15,10 +16,10 @@ let runtimeChart: Chart;
 let populationChart: Chart;
 
 const debounce = (func: Function, time = 100) => {
-  let timeoutId: ReturnType<typeof setTimeout>;
+  //let timeoutId: ReturnType<typeof setTimeout>;
   return function (this: any, ...args: any[]) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func.apply(this, args), time);
+    clearTimeout(debounceIdSlot);
+    debounceIdSlot = setTimeout(() => func.apply(this, args), time);
   };
 }
 
@@ -29,9 +30,7 @@ export default function setupChart() {
       callbacks: {
         label: function (ctx) {
           let frame = ctx.parsed.x;
-          console.log(frame);
-
-          debounce(() => { updateDensityMap(densityMapData[frame]) }, 50)()
+          debounce(() => { updateDensityMap(densityMapData[frame]) }, 10)()
 
         }
       }
