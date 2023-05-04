@@ -18,6 +18,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   </div>
   <div id="results">
     <canvas id="density-map"></canvas>
+    <div id="density-map-select">
+      <span class="unselectable"></span>
+    </div>
     <canvas id="density-chart"></canvas>
     <canvas id="population-chart"></canvas>
     <canvas id="runtime-chart"></canvas>
@@ -40,10 +43,10 @@ const getSimBtn: HTMLButtonElement | null = document.getElementById("form-sim-bt
 getSimBtn.addEventListener('click', e => {
   e.preventDefault()
   clearGraph()
-  updateGraphRange(parseInt(simRuntime.value)*30)
+  updateGraphRange(parseInt(simRuntime.value) * 30)
   preview!.style.opacity = "0.2";
   results.style.width = '100%';
-  
+
   let simRequest: SimRequestDto = {
     agent_num: parseInt(simAgentNum.value),
     runtime: parseInt(simRuntime.value),
@@ -57,11 +60,11 @@ getSimBtn.addEventListener('click', e => {
       }
     ]
   }
-  
-  
+
+
   let ws = new WebSocket("ws://localhost:8000/ws");
   ws.onopen = () => ws.send(JSON.stringify(simRequest));
-  ws.onmessage = function(event) { 
+  ws.onmessage = function (event) {
     let data = JSON.parse(event.data);
 
     switch (data.type) {
@@ -76,9 +79,9 @@ getSimBtn.addEventListener('click', e => {
 
       case 1:
         updateGraphAddData(data);
-        let prog = data.progress/(parseInt(simRuntime.value)*30);
+        let prog = data.progress / (parseInt(simRuntime.value) * 30);
         progressBar.style.opacity = "0.2";
-        progressBar.style.width = (prog*SIM_SIZE).toString() + 'px';
+        progressBar.style.width = (prog * SIM_SIZE).toString() + 'px';
         break
 
       default:
