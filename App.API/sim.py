@@ -23,6 +23,7 @@ FPS = 30
 METER = 8
 WALKING_SPEED = METER*1.42*2
 AGENT_MAX = 1200
+MAX_FIELD_AGE = 4
 KILL_RADIUS = 4
 
 AGENT_RADIUS = 2
@@ -258,7 +259,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
-    #sim.field_list[0].draw()
+    sim.field_list[0].draw()
 
     for person in sim.person_list:
         person.draw()
@@ -281,7 +282,7 @@ def sim_update(sim: Simulator) -> Image:
     sim.total_steps += 1
     #update flow field every second
     sim.field_age += 1
-    if sim.field_age >= 4:
+    if sim.field_age >= MAX_FIELD_AGE:
         for field in sim.field_list:
             field.update()
         sim.field_age = 0
