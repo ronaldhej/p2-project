@@ -102,6 +102,9 @@ export function updateGraphRange(range: number) {
 }
 
 export function updateGraphAddData(data: any) {
+  if (data.progress <= 0) {
+    densityMapData = [];
+  }
   densityMapData.push(data.densityField);
   updateDensityMap(data.densityField);
   simData.push(data);

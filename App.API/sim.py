@@ -259,7 +259,7 @@ def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
     #draw_grid(sim.flowfield.resolution)
-    sim.field_list[0].draw()
+    #sim.field_list[0].draw()
 
     for person in sim.person_list:
         person.draw()
