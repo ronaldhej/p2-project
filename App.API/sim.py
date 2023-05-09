@@ -23,7 +23,7 @@ FPS = 30
 METER = 8
 WALKING_SPEED = METER*1.42*2
 AGENT_MAX = 1200
-MAX_FIELD_AGE = 4
+MAX_FIELD_AGE = 1
 KILL_RADIUS = 4
 BOTTOM_TOP_RATIO = 0.2
 
@@ -180,10 +180,10 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
     print("sim start")
     agent_num_list = []
     # arcade.run()
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (6,30))
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (28,30))
     flowfield.setup(window.wall_list)
     window.field_list.append(flowfield)
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (3,1))
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (28,1))
     flowfield.setup(window.wall_list)
     window.field_list.append(flowfield)
 
@@ -245,7 +245,7 @@ def draw_grid(res: int):
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    draw_grid(64)
+    #draw_grid(64)
     #sim.field_list[0].draw()
 
     for person in sim.person_list:
