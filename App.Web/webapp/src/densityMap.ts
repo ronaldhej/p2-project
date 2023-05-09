@@ -71,7 +71,7 @@ export function updateDensityMap(densityField: number[][]) {
             let y = yy;
 
             let density = densityField[x][y];
-            let sqMeterCount = density * (8 / (512 / 32));
+            let sqMeterCount = density * (8 / (512 / 16));
             let densityValue = Math.min(sqMeterCount / 7, 1);
 
             if (sqMeterCount > 7) {
