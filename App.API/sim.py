@@ -22,7 +22,7 @@ SPACE_HEIGHT = 512
 FPS = 30
 METER = 8
 WALKING_SPEED = METER*1.42*2
-AGENT_MAX = 1200
+AGENT_MAX = 3000
 MAX_FIELD_AGE = 1
 KILL_RADIUS = 4
 BOTTOM_TOP_RATIO = 0.2
@@ -79,7 +79,7 @@ class Simulator(arcade.Window):
         self.runtime = runtime
         #space
         self.space = pymunk.Space()
-        self.space.iterations = 100
+        self.space.iterations = 35
         self.space.gravity = (0.0, 0.0)
         #Object Lists
         self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
