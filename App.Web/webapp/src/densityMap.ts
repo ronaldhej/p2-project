@@ -107,9 +107,11 @@ export function updateDensityMap(densityField: number[][]) {
 function updateDensityTooltip(cx?: number, cy?: number) {
     let cellX = cx ?? selectionCellPos.x;
     let cellY = cy ?? selectionCellPos.y;
-    let value = frameField[cellX][frameField[cellX].length - cellY - 1]; //good luck explaining this one :)
-
-    densityTooltip.innerText = `agents: ${value.toString()}\ndensity: ${value * (8 / (512 / 16))} agents/m²`;
-    console.log("hello");
+    try {
+        let value = frameField[cellX][frameField[cellX].length - cellY - 1]; //good luck explaining this one :)
+        densityTooltip.innerText = `agents: ${value.toString()}\ndensity: ${value * (8 / (512 / 16))} agents/m²`;
+    } catch (e) {
+        console.log("Something went wrong with density map: " + e);
+    }
 
 }

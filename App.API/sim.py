@@ -180,10 +180,10 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
     print("sim start")
     agent_num_list = []
     # arcade.run()
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (28,30))
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (resolution-1,resolution-1))
     flowfield.setup(window.wall_list)
     window.field_list.append(flowfield)
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (28,1))
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (resolution-1,0))
     flowfield.setup(window.wall_list)
     window.field_list.append(flowfield)
 
@@ -245,8 +245,8 @@ def draw_grid(res: int):
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    #draw_grid(64)
-    #sim.field_list[0].draw()
+    draw_grid(sim.field_list[0].resolution)
+    sim.field_list[0].draw()
 
     for person in sim.person_list:
         person.draw()

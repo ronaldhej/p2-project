@@ -106,7 +106,11 @@ export function updateGraphAddData(data: any) {
     densityMapData = [];
   }
   densityMapData.push(data.densityField);
-  updateDensityMap(data.densityField);
+  try {
+    updateDensityMap(data.densityField);
+  } catch (e) {
+    console.log(e);
+  }
   simData.push(data);
 
   //var maxRow = arr.map(function(row){ return Math.max.apply(Math, row); });
