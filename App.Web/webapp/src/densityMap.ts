@@ -71,10 +71,10 @@ export function updateDensityMap(densityField: number[][]) {
             let y = yy;
 
             let density = densityField[x][y];
-            let sqMeterCount = density * (8 / (512 / 32));
+            let sqMeterCount = density * (8 / (512 / 16));
             let densityValue = Math.min(sqMeterCount / 7, 1);
 
-            if (sqMeterCount > 7) {
+            if (sqMeterCount >= 7) {
                 densityValue = Math.min((sqMeterCount - 7) / 5, 1);
             }
 
@@ -82,7 +82,7 @@ export function updateDensityMap(densityField: number[][]) {
             let g = 0;
             let b = 0;
 
-            if (sqMeterCount > 7) {
+            if (sqMeterCount >= 7) {
                 r = riskLow[0] + densityValue * (riskHigh[0] - riskLow[0]);
                 g = riskLow[1] + densityValue * (riskHigh[1] - riskLow[1]);
                 b = riskLow[2] + densityValue * (riskHigh[2] - riskLow[2]);
@@ -109,7 +109,7 @@ function updateDensityTooltip(cx?: number, cy?: number) {
     let cellY = cy ?? selectionCellPos.y;
     let value = frameField[cellX][frameField[cellX].length - cellY - 1]; //good luck explaining this one :)
 
-    densityTooltip.innerText = `agents: ${value.toString()}\ndensity: ${value * (8 / (512 / 32))} agents/m²`;
+    densityTooltip.innerText = `agents: ${value.toString()}\ndensity: ${value * (8 / (512 / 16))} agents/m²`;
     console.log("hello");
 
 }

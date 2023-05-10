@@ -22,9 +22,10 @@ SPACE_HEIGHT = 512
 FPS = 30
 METER = 8
 WALKING_SPEED = METER*1.42*2
-AGENT_MAX = 1200
-MAX_FIELD_AGE = 4
+AGENT_MAX = 3000
+MAX_FIELD_AGE = 1
 KILL_RADIUS = 4
+BOTTOM_TOP_RATIO = 0.2
 
 AGENT_RADIUS = 2
 PERSONAL_SPACE = 3
@@ -78,7 +79,7 @@ class Simulator(arcade.Window):
         self.runtime = runtime
         #space
         self.space = pymunk.Space()
-        self.space.iterations = 100
+        self.space.iterations = 35
         self.space.gravity = (0.0, 0.0)
         #Object Lists
         self.person_list: arcade.SpriteList[Agent] = arcade.SpriteList()
@@ -148,10 +149,10 @@ class Simulator(arcade.Window):
     def add_agent(self, frame):
         if frame%2==0:    
             field_id = 0
-            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, 32 + (random.random()-0.5)*16
+            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*(512-64), 8 + (random.random()-0.5)*8
         else:
             field_id = 1
-            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*300, SPACE_HEIGHT - (random.random()-0.5)*16 - 32
+            pos = (SPACE_WIDTH / 2) + (random.random()-0.5)*(512-64), SPACE_HEIGHT - (random.random()-0.5)*16 - 32
         
         inertia = pymunk.moment_for_circle(1, 0, AGENT_RADIUS, (0, 0))
         body = pymunk.Body(1,  inertia)
@@ -172,31 +173,17 @@ class Scenario:
 async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int, resolution) -> tuple[io.BytesIO, list[int]]:
     """run simulation on input parameters and return results"""
     window = Simulator(agent_num, runtime, False)
-    window.add_wall([
-                    (4,128-32),
-                    (256-16,128),
-                    (256-14, SPACE_HEIGHT - 64),
-                    (4,SPACE_HEIGHT - 32)])
-    window.add_wall([
-                    (SPACE_WIDTH - 4,128-32),
-                    (256+16,128),
-                    (256+14, SPACE_HEIGHT - 64),
-                    (SPACE_WIDTH - 4,SPACE_HEIGHT - 32)])
-    window.add_wall([
-                    (256-32,72+8),
-                    (256-32,72-8),
-                    (256+32,72+40),
-                    (256+140,72+16),
-                    (256+128,72-8)])
+    window.add_wall([(0,32),(256-16,32),(256-16,32+400),(0,32+400)])
+    window.add_wall([(512,32),(256+16,32),(256+16,32+400),(512,32+400)])
     window.setup()
     
     print("sim start")
     agent_num_list = []
     # arcade.run()
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (6,30))
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (28,30))
     flowfield.setup(window.wall_list)
     window.field_list.append(flowfield)
-    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (3,1))
+    flowfield = FlowField(SPACE_WIDTH, SPACE_HEIGHT, resolution, (28,1))
     flowfield.setup(window.wall_list)
     window.field_list.append(flowfield)
 
@@ -204,7 +191,7 @@ async def run_agent_sim(socket: WebSocket, frames, save, agent_num, runtime:int,
     for f in range(runtime*FPS):
         if len(window.person_list) < AGENT_MAX:
             for i in range(agent_num):
-                if random.random() < 0.8:
+                if random.random() < BOTTOM_TOP_RATIO:
                     window.add_agent(0)
                 else:
                     window.add_agent(1)
@@ -258,7 +245,7 @@ def draw_grid(res: int):
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    #draw_grid(sim.flowfield.resolution)
+    #draw_grid(64)
     #sim.field_list[0].draw()
 
     for person in sim.person_list:
