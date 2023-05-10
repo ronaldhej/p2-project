@@ -1,11 +1,11 @@
-#import os
-#os.environ["ARCADE_HEADLESS"] = "true"
+import os
+os.environ["ARCADE_HEADLESS"] = "true"
+import pyrender
 
 import sys
 from PIL import Image, ImageDraw
 import arcade
 import pymunk
-import pyrender
 import io
 import math
 import random
