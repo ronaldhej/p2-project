@@ -17,6 +17,8 @@ from fastapi import WebSocket, WebSocketDisconnect
 import base64
 # import glcontext
 
+DEBUG = False
+
 SPACE_WIDTH = 512
 SPACE_HEIGHT = 512
 FPS = 30
@@ -245,8 +247,10 @@ def draw_grid(res: int):
 def sim_draw(sim: Simulator):
     """draw step of simulation"""
     sim.clear()
-    draw_grid(sim.field_list[0].resolution)
-    sim.field_list[0].draw()
+    
+    if DEBUG:
+        draw_grid(sim.field_list[0].resolution)
+        sim.field_list[0].draw()
 
     for person in sim.person_list:
         person.draw()

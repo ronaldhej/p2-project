@@ -4,7 +4,7 @@ let densityTooltip: HTMLSpanElement;
 let ctx: CanvasRenderingContext2D | null;
 const RES = 32
 
-let frameField: number[][];
+let densityFieldFrame: number[][];
 let selectionCellPos = {
     x: 0,
     y: 0
@@ -14,6 +14,11 @@ const colorLow: number[] = [30, 33, 45];
 const colorHigh: number[] = [255, 255, 255];
 const riskLow: number[] = [241, 139, 55];
 const riskHigh: number[] = [228, 79, 34];
+
+const mapSize = 512;
+const meterPixels = 8;
+const mapResoultion = 32;
+const mapCellSize = mapSize / mapResoultion;
 
 export function setupDensityMap(id: string) {
     canvas = document.getElementById(id) as HTMLCanvasElement ?? null;
@@ -56,7 +61,7 @@ export function setupDensityMap(id: string) {
 
 export function updateDensityMap(densityField: number[][]) {
 
-    frameField = densityField;
+    densityFieldFrame = densityField;
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
     if (ctx == null) return
@@ -70,19 +75,19 @@ export function updateDensityMap(densityField: number[][]) {
             let x = xx;
             let y = yy;
 
-            let density = densityField[x][y];
-            let sqMeterCount = density * (8 / (512 / 16));
-            let densityValue = Math.min(sqMeterCount / 7, 1);
+            let agentCount = densityField[x][y];
+            let density = agentCountToDensity(agentCount);
+            let densityValue = Math.min(density / 7, 1);
 
-            if (sqMeterCount >= 7) {
-                densityValue = Math.min((sqMeterCount - 7) / 5, 1);
+            if (density >= 7) {
+                densityValue = Math.min((density - 7) / 5, 1);
             }
 
             let r = 0;
             let g = 0;
             let b = 0;
 
-            if (sqMeterCount >= 7) {
+            if (density >= 7) {
                 r = riskLow[0] + densityValue * (riskHigh[0] - riskLow[0]);
                 g = riskLow[1] + densityValue * (riskHigh[1] - riskLow[1]);
                 b = riskLow[2] + densityValue * (riskHigh[2] - riskLow[2]);
@@ -108,10 +113,15 @@ function updateDensityTooltip(cx?: number, cy?: number) {
     let cellX = cx ?? selectionCellPos.x;
     let cellY = cy ?? selectionCellPos.y;
     try {
-        let value = frameField[cellX][frameField[cellX].length - cellY - 1]; //good luck explaining this one :)
-        densityTooltip.innerText = `agents: ${value.toString()}\ndensity: ${value * (8 / (512 / 16))} agents/m²`;
+        //subtract y index from field height, since the 2D array is flipped
+        let agentCount = densityFieldFrame[cellX][densityFieldFrame[cellX].length - cellY - 1];
+        densityTooltip.innerText = `agents: ${agentCount.toString()}\ndensity: ${agentCountToDensity(agentCount)} agents/m²`;
     } catch (e) {
         console.log("Something went wrong with density map: " + e);
     }
 
+}
+
+function agentCountToDensity(count: number) {
+    return count * (meterPixels / (mapSize / mapCellSize));
 }
