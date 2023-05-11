@@ -24,7 +24,4 @@ COPY . .
 EXPOSE 8000
 
 # Start server
-CMD ["bash", "-c", "echo starting on display ${DISPLAY}... && \
-    Xvfb ${DISPLAY} -screen 0 1024x768x16 && \
-    sleep 1 && \
-    uvicorn server:app --host 0.0.0.0 --port 8000"]
+CMD ["/bin/bash", "-c", "./startup.sh"]
