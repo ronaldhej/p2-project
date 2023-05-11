@@ -1,7 +1,6 @@
 # Python version used
 FROM python:3.10
 
-# Set up virtual display
 ENV DISPLAY=:99
 
 # Install Xvfb and other dependencies
@@ -14,13 +13,18 @@ RUN apt-get update && \
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
+
+#Setup virtual display
+
+
 COPY . .
 
 # Expose port 8000 for incoming traffic
 EXPOSE 8000
 
-# Start Xvfb and server
-CMD ["bash", "-c", "Xvfb $DISPLAY -screen 0 1024x768x24 > /dev/null 2>&1 & \
-                     sleep 1 && \
-                     source venv/bin/activate && \
-                     exec uvicorn server:app --host 0.0.0.0 --port 8000"]
+# Start server
+CMD ["bash", "-c", "echo starting on display ${DISPLAY}... && \
+    Xvfb ${DISPLAY} -screen 0 1024x768x16 && \
+    sleep 1 && \
+    uvicorn server:app --host 0.0.0.0 --port 8000"]
