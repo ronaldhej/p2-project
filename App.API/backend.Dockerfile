@@ -20,8 +20,11 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
+
+RUN chmod +x startup.sh
+
 # Expose port 8000 for incoming traffic
 EXPOSE 8000
 
-# Start server
-CMD ["/bin/bash", "-c", "./startup.sh"]
+
+CMD ["bash", "-c", "./startup.sh"]
