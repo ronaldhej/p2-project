@@ -1,7 +1,8 @@
-import os
-os.environ["ARCADE_HEADLESS"] = "true"
+# import os
+# os.environ["ARCADE_HEADLESS"] = "true"
 import pyrender
-
+import pyglet
+pyglet.options["headless"] = True
 import sys
 from PIL import Image, ImageDraw
 import arcade

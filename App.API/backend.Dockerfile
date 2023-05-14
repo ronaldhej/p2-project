@@ -1,6 +1,7 @@
 # Python version used
 FROM python:3.10
 
+ENV ARCADE_HEADLESS=1
 ENV DISPLAY=:99
 
 # Install Xvfb and other dependencies
