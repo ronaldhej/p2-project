@@ -1,7 +1,7 @@
 # Python version used
 FROM python:3.10
 
-ENV ARCADE_HEADLESS=1
+ENV ARCADE_HEADLESS=True
 ENV DISPLAY=:99
 
 # Install Xvfb and other dependencies
@@ -27,5 +27,4 @@ RUN chmod +x startup.sh
 # Expose port 8000 for incoming traffic
 EXPOSE 8000
 
-
-CMD ["bash", "-c", "./startup.sh"]
+CMD [ "/bin/bash", "-c", "./startup.sh" ]
