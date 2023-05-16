@@ -17,7 +17,7 @@ RUN npm install
 WORKDIR /app/webapp
 
 # Expose port 5173 for incoming traffic
-EXPOSE 5173
+EXPOSE 3000
 
 # Start the frontend server
 CMD [ "npm", "run", "dev" ]

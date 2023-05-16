@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: api
+    tier: backend
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: api
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: api
+        tier: backend
+    spec:
+      containers:
+      - name: simulation-api
+        image: alexrefstudent/craps-api:0.0.1
+        ports:
+        - containerPort: 8000
