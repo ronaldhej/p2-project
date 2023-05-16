@@ -1,0 +1,26 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: webapp-service
+spec: 
+  selector:
+    app: webapp
+    tier: frontend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: api-service
+spec: 
+  selector:
+    app: api
+    tier: backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+  type: LoadBalancer

@@ -20,6 +20,7 @@ spec:
     spec:
       containers:
       - name: simulation-api
-        image: alexrefstudent/craps-api:0.0.1
+        image: alexrefstudent/craps-api:0.0.2
         ports:
-        - containerPort: 8000
+        - name: http 
+          containerPort: 8000

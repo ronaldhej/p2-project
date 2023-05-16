@@ -6,7 +6,7 @@ metadata:
     app: webapp
     tier: frontend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: webapp
@@ -21,4 +21,5 @@ spec:
       - name: webapp
         image: alexrefstudent/craps-webapp:0.0.1
         ports:
-        - containerPort: 5173
+        - name: http
+          containerPort: 5173
