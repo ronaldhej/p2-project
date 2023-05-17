@@ -32,7 +32,7 @@ export function setupNavbar() {
 
         link.addEventListener('click', e => {
             console.log(e.target, views[i]);
-            const clicked = e.target;
+            const clicked = e.target as Element;
 
             for (let btn of navbar.children) {
                 btn.classList.remove("active-link");

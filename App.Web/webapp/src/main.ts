@@ -1,6 +1,6 @@
 import './style.css'
-import navbar, { setupNavbar } from './navbar'
-import './simulationDtos'
+import navbar from './navbar'
+import { SimRequestDto } from './simulationDtos'
 import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './simCharts'
 import { setupDensityMap } from './densityMap'
 const SIM_SIZE = 512;
@@ -30,7 +30,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 setupChart();
 setupDensityMap("density-map");
 
-const app: HTMLElement | null = document.getElementById("app");
+//const app: HTMLElement | null = document.getElementById("app");
 const preview: HTMLImageElement | null = document.getElementById("img-preview") as HTMLImageElement;
 const progressBar: HTMLDivElement | null = document.getElementById("progress-bar") as HTMLDivElement;
 const results: HTMLDivElement | null = document.getElementById("results") as HTMLDivElement;
@@ -39,6 +39,13 @@ const results: HTMLDivElement | null = document.getElementById("results") as HTM
 const simAgentNum: HTMLInputElement | null = document.getElementById("simAgentNum") as HTMLInputElement;
 const simRuntime: HTMLInputElement | null = document.getElementById("simRuntime") as HTMLInputElement;
 const getSimBtn: HTMLButtonElement | null = document.getElementById("form-sim-btn") as HTMLButtonElement;
+
+let urlCurrent = window.location.href.split('/');
+urlCurrent.pop();
+let url = urlCurrent.join('/');
+console.log(`api address set to: ${url}`);
+url = 'p2-api.alexref.com/';
+
 
 getSimBtn.addEventListener('click', e => {
   e.preventDefault()
@@ -61,8 +68,7 @@ getSimBtn.addEventListener('click', e => {
     ]
   }
 
-
-  let ws = new WebSocket("ws://localhost:8000/ws");
+  let ws = new WebSocket(`ws://${url}ws`);
   ws.onopen = () => ws.send(JSON.stringify(simRequest));
   ws.onmessage = function (event) {
     let data = JSON.parse(event.data);
