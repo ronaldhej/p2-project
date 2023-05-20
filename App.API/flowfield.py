@@ -68,18 +68,18 @@ class FlowField:
         self.cell_width = round(self.width/self.resolution)
         self.cell_height = round(self.width/self.resolution)
         self.field = [[Cell]*self.resolution for _ in range(self.resolution)]
-        for i in range(self.resolution):
-            for j in range(self.resolution):
-                print("initialising cell: ", i,j)
-                new_cell:Cell = Cell(i,j)
+        for x in range(self.resolution):
+            for y in range(self.resolution):
+                print("initialising cell: ", x,y)
+                new_cell:Cell = Cell(x,y)
                 new_cell.direction = math.radians(random.random()*360)
                 
                 for w in wall_list:
-                    point = (i*self.cell_width + (self.cell_width/2), j*self.cell_width + (self.cell_width/2))
+                    point = (x*self.cell_width + (self.cell_width/2), y*self.cell_width + (self.cell_width/2))
                     if w.point_query(point).distance < 0:
                         new_cell.cost = MAX_COST + 1
 
-                self.field[i][j] = new_cell
+                self.field[x][y] = new_cell
 
 
         #add neighbors
@@ -117,9 +117,9 @@ class FlowField:
         (dest_x, dest_y) = self.destination_cell
         open_list:list[Cell] = []
         current_cell:Cell = None
-        for i in range(self.resolution):
-            for j in range(self.resolution):
-                cell = self.field[i][j]
+        for x in range(self.resolution):
+            for y in range(self.resolution):
+                cell = self.field[x][y]
 
                 if cell == self.field[dest_x][dest_y]:
                     cell.cost = 0
@@ -143,9 +143,9 @@ class FlowField:
                     cell.cost = new_cost
 
 
-        for i in range(self.resolution):
-            for j in range(self.resolution):
-                cell = self.field[i][j]
+        for x in range(self.resolution):
+            for y in range(self.resolution):
+                cell = self.field[x][y]
 
                 best:Cell = cell.neighbors[0]
                 for n in cell.neighbors:
