@@ -103,101 +103,6 @@ body {
   overflow-x: hidden;
 }
 
-
-.navbar {
-  margin-top: 2rem;
-  margin-left: 2rem;
-  position: fixed;
-  display: flex;
-  flex-direction: column;
-  width: fit-content;
-  height: fit-content;
-  z-index: 1;
-}
-
-.navbar button{
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: start;
-  margin: 0;
-  padding: 0.8rem;
-  border-radius: 0;
-
-  font-size: 12pt;
-  cursor: pointer;
-  text-align: left;
-  background-color: var(--c-semidark);
-  color: var(--c-light);
-  border: 0px solid var(--c-dark);
-  
-  height: fit-content;
-  width: 100%;
-  max-width: 8rem;
-
-  transition: 0.2s;
-}
-
-.navbar button:hover{
-  background-color: var(--c-mid);
-  border-bottom-color: var(--c-mid);
-  transition: 0.5s;
-}
-
-.navbar button:active{
-  background-color: var(--c-attention);
-  border-bottom-color: var(--c-attention);
-  transform: none;
-  transition: 0.0s;
-}
-
-.navbar button:first-of-type{
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-}
-
-.navbar button:last-of-type{
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-
-.navbar button:not(:last-of-type){
-  /* border-bottom: 2px solid #494a4d; */
-}
-.navbar button.active-link {
-  margin-left: 1em;
-  border-top-right-radius: 12px;
-  border-bottom-right-radius: 12px;
-}
-.navbar button:has( + button.active-link) {
-  border-bottom-left-radius: 24px;
-  border-bottom: 8px solid var(--c-dark);
-}
-.navbar button.active-link + button {
-  border-top-left-radius: 24px;
-  border-top: 8px solid var(--c-dark);
-}
-.navbar button.active-link span {
-  width: 4px;
-  min-width: 4px;
-  height: 3em;
-  background-color: var(--c-attention);
-  opacity: 1;
-  transition: .2s ease-out;
-}
-
-.navbar button span {
-  display:block;
-  margin-right: 8px;
-  padding: 0px;
-  width: 0.5em;
-  min-width: .5em;
-  height: 0px;
-  background-color: var(--c-mid);
-  opacity: 0;
-  border-radius: 999px;
-  transition: .2s ease-out;
-}
-
 #img-preview {
   border-radius: 8px;
   opacity: 0.2;
@@ -271,14 +176,4 @@ input:focus {
   outline: none;
 
   transition: 0.1s ease-out;
-}
-
-@keyframes rotation {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(359deg);
-  }
 }

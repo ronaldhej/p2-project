@@ -1,12 +1,10 @@
 import './style.css'
-import navbar, { setupNavbar } from './navbar'
 import './simulationDtos'
 import setupChart, { clearGraph, updateGraphAddData, updateGraphRange } from './simCharts'
 import { setupDensityMap } from './densityMap'
 const SIM_SIZE = 512;
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  ${navbar()}
   <div id="content">
     <div>
       <div class="progress-bar" id="progress-bar"></div>
@@ -26,7 +24,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <canvas id="runtime-chart"></canvas>
   </div>
 `
-//setupNavbar();
 setupChart();
 setupDensityMap("density-map");
 

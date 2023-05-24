@@ -45,26 +45,7 @@ app.add_middleware(
 @app.get("/")
 async def root():
     """get"""
-    return {"message": "Hello World"}
-
-@app.post("/simulate")
-async def run_sim(request: SimRequestDto):
-    """post"""
-    print("simulate")
-    try:
-        # buf = io.BytesIO()
-        # image.save(buf, "GIF")
-        image_buffer, agent_amount_data = await sim.run_agent_sim(None, 60, False, request.agent_num, request.runtime, FIELD_RES)
-        print(agent_amount_data)
-
-        image_buffer.seek(0)  # important here!
-
-        buffer_bytes = image_buffer.getvalue()
-        buffer_base64 = base64.b64encode(buffer_bytes)
-        return JSONResponse(content={"sim_gif": buffer_base64.decode('utf-8'), "density_data": agent_amount_data}, status_code=200)
-    except Exception as error:
-        print(error)
-        return JSONResponse(content={"msg": "deez"}, status_code=500)
+    return {"message": "This is the root of the simulation API"}
 
 @app.websocket("/ws")
 async def run_socket_sim(socket: WebSocket):
