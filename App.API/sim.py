@@ -29,6 +29,7 @@ AGENT_MAX = 3000
 MAX_FIELD_AGE = 1
 KILL_RADIUS = 4
 BOTTOM_TOP_RATIO = 0.2
+WALKING_SPEED_RANGE = 20
 
 AGENT_RADIUS = 2
 PERSONAL_SPACE = 3
@@ -54,7 +55,7 @@ class Agent(arcade.Sprite):
         self.pymunk_shape = pymunk_shape
         self.direction = 0
         self.target_direction = 0
-        self.magnitude = WALKING_SPEED
+        self.magnitude = WALKING_SPEED + (random.random()-0.5)*2*WALKING_SPEED_RANGE
         self.nearby_agents = 0
         self.field_id = field_id
 
